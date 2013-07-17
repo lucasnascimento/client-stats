@@ -41,9 +41,7 @@ public class Main {
 		List<Table> tableTarget = loadTables(connTarget);
 		DbUtils.close(connSource);
 		DbUtils.close(connTarget);
-		System.out.println(tableTarget);
 		compareTable(tableSource, tableTarget);
-		System.out.println(tableTarget);
 	}
 
 	private static void compareTable(List<Table> tableSourceList,
