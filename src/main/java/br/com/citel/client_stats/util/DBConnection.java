@@ -15,27 +15,48 @@ public class DBConnection {
 		}
 	}
 
-	public static Connection getConnectionSource() throws SQLException {
-
-		Connection conn = null;
-		Properties connectionProps = new Properties();
-		connectionProps.put("user", "root");
-		connectionProps.put("password", "root");
-
-		conn = DriverManager.getConnection("jdbc:mysql://192.168.0.105/AUTCOM",
-				connectionProps);
-		return conn;
-	}
-	
-	public static Connection getConnectionTarget() throws SQLException {
+	public static Connection getConnectionSource() {
 
 		Connection conn = null;
 		Properties connectionProps = new Properties();
 		connectionProps.put("user", "root");
 		connectionProps.put("password", "123456");
 
-		conn = DriverManager.getConnection("jdbc:mysql://localhost/AUTCOM",
-				connectionProps);
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/SourceDatabase", connectionProps);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return conn;
+	}
+
+	public static Connection getConnectionTarget() {
+
+		Connection conn = null;
+		Properties connectionProps = new Properties();
+		connectionProps.put("user", "root");
+		connectionProps.put("password", "123456");
+
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost/TargetDatabase", connectionProps);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return conn;
+	}
+
+	public static Connection getConnectionTest() {
+
+		Connection conn = null;
+		Properties connectionProps = new Properties();
+		connectionProps.put("user", "root");
+		connectionProps.put("password", "123456");
+
+		try {
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", connectionProps);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return conn;
 	}
 
