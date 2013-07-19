@@ -63,7 +63,9 @@ public class Monitor {
 			}
 
 		}
-
+		for (Table tableTarget : tableTargetList) {
+			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(),"table not found on source"));
+		}
 	}
 
 	private static void compareField(String tableName, List<Field> fieldSourceList, List<Field> fieldTargetList) {
@@ -74,7 +76,7 @@ public class Monitor {
 			} else {
 				Field fieldTarget = fieldTargetList.remove(fieldTargetIndex);
 				if (!fieldTarget.getType().equalsIgnoreCase(fieldSource.getType())) {
-					dbTicketList.add(new DatabaseTicket(tableName, String.format("field target's type inconsistency: %s - Source: %s %s Target: %s %s ", fieldSource.getFieldName(), fieldSource.getType(), fieldTarget.getFieldName(), fieldTarget.getType())));
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("field target's type inconsistency: Source: %s %s Target: %s %s ", fieldSource.getFieldName(), fieldSource.getType(), fieldTarget.getFieldName(), fieldTarget.getType())));
 				}
 			}
 		}
@@ -91,7 +93,7 @@ public class Monitor {
 			} else {
 				Index indexTarget = indexTargetList.remove(indexTargetIndex);
 				if (!indexTarget.getColumnName().equalsIgnoreCase(indexSource.getColumnName())) {
-					dbTicketList.add(new DatabaseTicket(tableName,String.format("index target's columns inconsistency: %s - Source: %s %s Target: %s %s ", indexSource.getIndexName(), indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
+					dbTicketList.add(new DatabaseTicket(tableName,String.format("index target's columns inconsistency: Source: %s %s Target: %s %s ", indexSource.getIndexName(), indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
 				}
 			}
 		}
