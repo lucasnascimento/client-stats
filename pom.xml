@@ -208,4 +208,8 @@
 		</repository>
 	</repositories>
 
+	<organization>
+		<name>Citel Software</name>
+		<url>http://www.citelsoftware.com.br</url>
+	</organization>
 </project>
