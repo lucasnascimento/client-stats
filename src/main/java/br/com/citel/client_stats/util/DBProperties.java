@@ -2,12 +2,13 @@ package br.com.citel.client_stats.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class DBProperties {
 
 	static final String CONFIG_FILE_NAME = "config.properties";
-	
+
 	private static DBProperties properties = null;
 
 	static final Properties PROPS = new Properties();
@@ -25,9 +26,11 @@ public class DBProperties {
 
 	public DBProperties() {
 		try {
-			FileInputStream fileIS = new FileInputStream(new File(CONFIG_FILE_NAME));
-			PROPS.load(fileIS);
-			
+			InputStream is = ClassLoader.getSystemResourceAsStream(CONFIG_FILE_NAME);
+			if (is != null)
+				PROPS.load(is);
+			else
+				PROPS.load(new FileInputStream(new File(CONFIG_FILE_NAME)));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
