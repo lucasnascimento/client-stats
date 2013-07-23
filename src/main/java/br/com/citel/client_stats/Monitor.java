@@ -34,12 +34,13 @@ public class Monitor {
 
 	public static void main(String[] args) throws SQLException {
 		processDatabaseValidation();
-		
-		for(DatabaseTicket dbticket : dbTicketList){
+
+		// TODO: Implementar processo de gração no banco de dados dos tickets
+		for (DatabaseTicket dbticket : dbTicketList) {
 			log.info(dbticket.toString());
 		}
-		
-		
+
+		// TODO: Implementar validação de espaço em disco.
 		// getDiskInfo();
 
 	}
@@ -70,7 +71,7 @@ public class Monitor {
 
 		}
 		for (Table tableTarget : tableTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(),"table not found on source"));
+			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(), "table not found on source"));
 		}
 	}
 
@@ -87,7 +88,7 @@ public class Monitor {
 			}
 		}
 		for (Field fieldTarget : fieldTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableName,String.format("field not found on source table: %s", fieldTarget.getFieldName())));
+			dbTicketList.add(new DatabaseTicket(tableName, String.format("field not found on source table: %s", fieldTarget.getFieldName())));
 		}
 	}
 
@@ -95,16 +96,16 @@ public class Monitor {
 		for (Index indexSource : indexSourceList) {
 			int indexTargetIndex = indexTargetList.indexOf(indexSource);
 			if (indexTargetIndex < 0) {
-				dbTicketList.add(new DatabaseTicket(tableName,String.format("index target not found: %s", indexSource.getIndexName())));
+				dbTicketList.add(new DatabaseTicket(tableName, String.format("index target not found: %s", indexSource.getIndexName())));
 			} else {
 				Index indexTarget = indexTargetList.remove(indexTargetIndex);
 				if (!indexTarget.getColumnName().equalsIgnoreCase(indexSource.getColumnName())) {
-					dbTicketList.add(new DatabaseTicket(tableName,String.format("index target's columns inconsistency: Source: %s %s Target: %s %s ", indexSource.getIndexName(), indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("index target's columns inconsistency: Source: %s %s Target: %s %s ", indexSource.getIndexName(), indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
 				}
 			}
 		}
 		for (Index indexTarget : indexTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableName,String.format("index not found on source table: %s", indexTarget.getIndexName())));
+			dbTicketList.add(new DatabaseTicket(tableName, String.format("index not found on source table: %s", indexTarget.getIndexName())));
 		}
 	}
 
