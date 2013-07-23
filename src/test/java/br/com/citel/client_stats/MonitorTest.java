@@ -22,12 +22,12 @@ public class MonitorTest {
 
 	@Test
 	public void testConnectionTest() throws SQLException {
-		Assert.assertNotNull(DBConnection.getConnectionTest());
+		Assert.assertNotNull(DBConnection.getConnectionSource());
 	}
 
 	@Test
 	public void testNoProblem() throws SQLException {
-		Connection testConn = DBConnection.getConnectionTest();
+		Connection testConn = DBConnection.getConnectionSource();
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(NO_PROBLEM);
 		DbUtils.closeQuietly(testConn);
@@ -37,7 +37,7 @@ public class MonitorTest {
 
 	@Test
 	public void testNewTable2OnSource() throws SQLException {
-		Connection testConn = DBConnection.getConnectionTest();
+		Connection testConn = DBConnection.getConnectionSource();
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(NEW_TABLE2_ON_SOURCE);
 		DbUtils.closeQuietly(testConn);
@@ -47,7 +47,7 @@ public class MonitorTest {
 
 	@Test
 	public void testLeftTable2OnTarget() throws SQLException {
-		Connection testConn = DBConnection.getConnectionTest();
+		Connection testConn = DBConnection.getConnectionSource();
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(LEFT_TABLE2_ON_TARGE);
 		DbUtils.closeQuietly(testConn);
@@ -57,7 +57,7 @@ public class MonitorTest {
 
 	@Test
 	public void testFieldProblem() throws SQLException {
-		Connection testConn = DBConnection.getConnectionTest();
+		Connection testConn = DBConnection.getConnectionSource();
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(FIELD_PROBLEM);
 		DbUtils.closeQuietly(testConn);
@@ -67,7 +67,7 @@ public class MonitorTest {
 
 	@Test
 	public void testIndexProblem() throws SQLException {
-		Connection testConn = DBConnection.getConnectionTest();
+		Connection testConn = DBConnection.getConnectionSource();
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(INDEX_PROBLEM);
 		DbUtils.closeQuietly(testConn);

@@ -6,7 +6,9 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class DBConnection {
-
+	
+	static DBProperties prop = DBProperties.getInstance();
+	
 	static {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -16,14 +18,13 @@ public class DBConnection {
 	}
 
 	public static Connection getConnectionSource() {
-
 		Connection conn = null;
 		Properties connectionProps = new Properties();
-		connectionProps.put("user", "root");
-		connectionProps.put("password", "123456");
-
+		connectionProps.put("user", prop.getSourceUser());
+		connectionProps.put("password", prop.getSourcePassword());
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost/SourceDatabase", connectionProps);
+			String connectionString = String.format("jdbc:mysql://%s:%s/%s", prop.getSourceHost(), prop.getSourcePort(), prop.getSourceDatebase());
+			conn = DriverManager.getConnection(connectionString, connectionProps);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -31,33 +32,18 @@ public class DBConnection {
 	}
 
 	public static Connection getConnectionTarget() {
-
 		Connection conn = null;
 		Properties connectionProps = new Properties();
-		connectionProps.put("user", "root");
-		connectionProps.put("password", "123456");
-
+		connectionProps.put("user", prop.getTargetUser());
+		connectionProps.put("password", prop.getTargetPassword());
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost/TargetDatabase", connectionProps);
+			String connectionString = String.format("jdbc:mysql://%s:%s/%s", prop.getTargetHost(), prop.getTargetPort(), prop.getTargetDatebase());
+			conn = DriverManager.getConnection(connectionString, connectionProps);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return conn;
 	}
 
-	public static Connection getConnectionTest() {
-
-		Connection conn = null;
-		Properties connectionProps = new Properties();
-		connectionProps.put("user", "root");
-		connectionProps.put("password", "123456");
-
-		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306", connectionProps);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return conn;
-	}
 
 }

@@ -34,6 +34,12 @@ public class Monitor {
 
 	public static void main(String[] args) throws SQLException {
 		processDatabaseValidation();
+		
+		for(DatabaseTicket dbticket : dbTicketList){
+			log.info(dbticket.toString());
+		}
+		
+		
 		// getDiskInfo();
 
 	}
