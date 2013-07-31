@@ -1,4 +1,4 @@
-package br.com.citel.client_stats.model;
+package br.com.citel.monitoramento.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

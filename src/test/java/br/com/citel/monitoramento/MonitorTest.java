@@ -1,4 +1,4 @@
-package br.com.citel.client_stats;
+package br.com.citel.monitoramento;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -8,9 +8,10 @@ import org.apache.commons.dbutils.DbUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import br.com.citel.client_stats.model.DatabaseTicket;
-import br.com.citel.client_stats.util.DBConnection;
-import br.com.citel.client_stats.util.ScriptRunner;
+import br.com.citel.monitoramento.Monitor;
+import br.com.citel.monitoramento.model.DatabaseTicket;
+import br.com.citel.monitoramento.util.DBConnection;
+import br.com.citel.monitoramento.util.ScriptRunner;
 
 public class MonitorTest {
 

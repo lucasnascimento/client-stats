@@ -1,4 +1,4 @@
-package br.com.citel.client_stats.util;
+package br.com.citel.monitoramento.util;
 
 import javax.sql.DataSource;
 
@@ -19,7 +19,7 @@ public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlace
 		
 		
 		
-		DataSource dataSource = beanFactory.getBean("dataSource", DataSource.class);
+		DataSource dataSource = beanFactory.getBean("autcomDS", DataSource.class);
 
         DbProperties dbProps = new DbProperties(dataSource,empresaFisica);
          

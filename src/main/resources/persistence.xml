@@ -9,7 +9,7 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
 <!-- 		<mapping-file>querys/Monitor.xml</mapping-file> -->
-		<class>br.com.citel.client_stats.entity.ConfigSistema</class>
+		<class>br.com.citel.monitoramento.entity.ConfigSistema</class>
 
 		<properties>
 			

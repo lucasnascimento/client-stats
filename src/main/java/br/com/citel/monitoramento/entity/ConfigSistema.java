@@ -1,4 +1,4 @@
-	package br.com.citel.client_stats.entity;
+	package br.com.citel.monitoramento.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

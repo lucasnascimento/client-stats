@@ -1,4 +1,4 @@
-package br.com.citel.client_stats.util;
+package br.com.citel.monitoramento.util;
 
 import java.io.File;
 import java.io.FileInputStream;

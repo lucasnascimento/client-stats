@@ -1,10 +1,10 @@
-package br.com.citel.client_stats.repository;
+package br.com.citel.monitoramento.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import br.com.citel.client_stats.entity.ConfigSistema;
+import br.com.citel.monitoramento.entity.ConfigSistema;
 
 @Repository
 public interface ConfigSistemaRepository extends CrudRepository<ConfigSistema, Long> {

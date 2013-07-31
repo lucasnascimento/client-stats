@@ -1,4 +1,4 @@
-package br.com.citel.client_stats;
+package br.com.citel.monitoramento;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

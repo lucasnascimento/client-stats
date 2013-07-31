@@ -85,7 +85,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>br.com.citel.client_stats.Monitor</mainClass>
+							<mainClass>br.com.citel.monitoramento.Monitor</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

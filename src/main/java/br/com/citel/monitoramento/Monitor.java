@@ -1,4 +1,4 @@
-package br.com.citel.client_stats;
+package br.com.citel.monitoramento;
 
 import java.io.File;
 import java.sql.Connection;
@@ -12,11 +12,11 @@ import lombok.extern.java.Log;
 
 import org.apache.commons.dbutils.DbUtils;
 
-import br.com.citel.client_stats.model.DatabaseTicket;
-import br.com.citel.client_stats.model.Field;
-import br.com.citel.client_stats.model.Index;
-import br.com.citel.client_stats.model.Table;
-import br.com.citel.client_stats.util.DBConnection;
+import br.com.citel.monitoramento.model.DatabaseTicket;
+import br.com.citel.monitoramento.model.Field;
+import br.com.citel.monitoramento.model.Index;
+import br.com.citel.monitoramento.model.Table;
+import br.com.citel.monitoramento.util.DBConnection;
 
 /**
  * A empresa Citel precisa de um software que monitore e armazene estatísticas
