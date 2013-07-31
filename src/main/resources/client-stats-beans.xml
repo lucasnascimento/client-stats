@@ -14,18 +14,45 @@
 	<jpa:repositories base-package="br.com.citel.client_stats.repository" />
 
 	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location">
-			<value>Monitor.ini</value>
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="order" value="1" />
+		<property name="locations">
+			<list>
+				<value>classpath:Monitor.ini</value>
+			</list>
 		</property>
 	</bean>
 
-	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+	<bean
+		class="br.com.citel.client_stats.util.DbPropertySourcesPlaceholderConfigurer">
+		<property name="order" value="2" />
+		<property name="placeholderPrefix" value="%{" />
+		<property name="placeholderSuffix" value="}" />
+		<property name="empresaFisica" value="001" />
+	</bean>
+
+	<bean id="autcomDS" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
 		<property name="jdbcUrl" value="jdbc:mysql://vmcitel:${portAutc}/${dataAutc}" />
 		<property name="user" value="${userAutc}" />
 		<property name="password" value="${passAutc}" />
+		<property name="maxStatements" value="500" />
+		<property name="maxIdleTime" value="1800" />
+		<property name="maxPoolSize" value="50" />
+		<property name="minPoolSize" value="5" />
+		<property name="initialPoolSize" value="5" />
+		<property name="acquireIncrement" value="3" />
+		<property name="idleConnectionTestPeriod" value="3000" />
+	</bean>
+
+	<bean id="portalDS" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl"
+			value="jdbc:mysql://%{CFG_IP_CIT}:%{CFG_PORCIT}/%{CFG_DATCIT}" />
+		<property name="user" value="%{CFG_USUCIT}" />
+		<property name="password" value="%{CFG_PASCIT}" />
 		<property name="maxStatements" value="500" />
 		<property name="maxIdleTime" value="1800" />
 		<property name="maxPoolSize" value="50" />

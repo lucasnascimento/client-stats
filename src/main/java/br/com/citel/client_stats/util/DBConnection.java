@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public class DBConnection {
 	
-	static DBProperties prop = DBProperties.getInstance();
+	static DBProperties__ prop = DBProperties__.getInstance();
 	
 	static {
 		try {
