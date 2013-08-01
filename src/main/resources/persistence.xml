@@ -4,15 +4,21 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
 	version="2.0">
 
-	<persistence-unit name="portalPU"
-		transaction-type="RESOURCE_LOCAL">
+	<persistence-unit name="autcomPU" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-
-<!-- 		<mapping-file>querys/Monitor.xml</mapping-file> -->
-		<class>br.com.citel.monitoramento.entity.ConfigSistema</class>
-
+		<class>br.com.citel.monitoramento.autcom.entity.ConfigSistema</class>
 		<properties>
-			
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="false" />
+			<property name="hibernate.use_sql_comments" value="true" />
+		</properties>
+	</persistence-unit>
+
+	<persistence-unit name="portalPU" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<class>br.com.citel.monitoramento.portal.entity.LOG_HD</class>
+		<class>br.com.citel.monitoramento.portal.entity.LOGBKP</class>
+		<properties>
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />
 			<property name="hibernate.use_sql_comments" value="true" />

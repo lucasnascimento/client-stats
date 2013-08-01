@@ -1,4 +1,4 @@
-	package br.com.citel.monitoramento.entity;
+	package br.com.citel.monitoramento.autcom.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

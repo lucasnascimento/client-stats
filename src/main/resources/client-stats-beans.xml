@@ -11,7 +11,16 @@
 
 	<context:component-scan base-package="br.com.citel.monitoramento" />
 	<tx:annotation-driven />
-	<jpa:repositories base-package="br.com.citel.monitoramento.repository" />
+
+	<jpa:repositories base-package="br.com.citel.monitoramento.autcom.repository"
+		entity-manager-factory-ref="autcomEntityManagerFactory"
+		transaction-manager-ref="autcomTM">
+	</jpa:repositories>
+
+	<jpa:repositories base-package="br.com.citel.monitoramento.portal.repository"
+		entity-manager-factory-ref="portalEntityManagerFactory"
+		transaction-manager-ref="portalTM">
+	</jpa:repositories>
 
 	<bean
 		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
@@ -46,6 +55,26 @@
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 
+	<bean id="autcomTM" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="autcomEntityManagerFactory" />
+	</bean>
+
+	<bean id="autcomEntityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:persistence.xml" />
+		<property name="persistenceUnitName" value="autcomPU" />
+		<!-- <property name="persistenceUnitManager" ref="persistenceUnitManager" 
+			/> -->
+		<property name="dataSource" ref="autcomDS" />
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.connection.charSet">UTF-8</prop>
+				<prop key="hibernate.connection.defaultNChar">true</prop>
+			</props>
+		</property>
+	</bean>
+
 	<bean id="portalDS" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
@@ -62,15 +91,17 @@
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 
-	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	<bean id="portalTM" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="portalEntityManagerFactory" />
 	</bean>
 
-	<bean id="entityManagerFactory"
+	<bean id="portalEntityManagerFactory"
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="persistenceXmlLocation" value="classpath:persistence.xml" />
 		<property name="persistenceUnitName" value="portalPU" />
-		<property name="dataSource" ref="autcomDS" />
+		<!-- <property name="persistenceUnitManager" ref="persistenceUnitManager" 
+			/> -->
+		<property name="dataSource" ref="portalDS" />
 		<property name="jpaProperties">
 			<props>
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
@@ -79,5 +110,17 @@
 			</props>
 		</property>
 	</bean>
+
+
+	<bean id="persistenceUnitManager"
+		class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
+		<property name="dataSources">
+			<map>
+				<entry key="d1" value-ref="autcomDS" />
+				<entry key="d2" value-ref="portalDS" />
+			</map>
+		</property>
+	</bean>
+
 
 </beans>
