@@ -1,6 +1,5 @@
 package br.com.citel.monitoramento;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Setter;
 import lombok.extern.java.Log;
 
 import org.apache.commons.dbutils.DbUtils;
@@ -29,19 +29,18 @@ import br.com.citel.monitoramento.util.DBConnection;
  */
 @Log
 public class DatabaseMonitor {
+	@Setter
+	private String monitoraDatabase;
 
 	private static List<DatabaseTicket> dbTicketList = new ArrayList<DatabaseTicket>();
 
-	public static void main(String[] args) throws SQLException {
+	public void run() throws SQLException {
 		processDatabaseValidation();
 
 		// TODO: Implementar processo de gração no banco de dados dos tickets
 		for (DatabaseTicket dbticket : dbTicketList) {
 			log.info(dbticket.toString());
 		}
-
-		// TODO: Implementar validação de espaço em disco.
-		// getDiskInfo();
 
 	}
 
@@ -106,14 +105,6 @@ public class DatabaseMonitor {
 		}
 		for (Index indexTarget : indexTargetList) {
 			dbTicketList.add(new DatabaseTicket(tableName, String.format("index not found on source table: %s", indexTarget.getIndexName())));
-		}
-	}
-
-	public static void getDiskInfo() {
-		File[] roots = File.listRoots();
-		for (File root : roots) {
-			float freeSpacePercent = (float) root.getFreeSpace() / (float) root.getTotalSpace();
-			log.info(String.format("filesystem: %s - disponivel: %.2f%%", root.getAbsoluteFile(), freeSpacePercent));
 		}
 	}
 

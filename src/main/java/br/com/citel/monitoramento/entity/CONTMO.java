@@ -9,7 +9,6 @@ import lombok.Data;
 
 @Entity
 public @Data class CONTMO {
-
 	@Id
 	private String TABELA;
 	@Id
@@ -20,6 +19,5 @@ public @Data class CONTMO {
 	private Long EMPRESA_FISICA;
 	@Id
 	private String CNPJ;
-	
 	private Long QTD_REG;
 }

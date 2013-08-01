@@ -6,7 +6,9 @@
 
 	<persistence-unit name="autcomPU" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>br.com.citel.monitoramento.entity.ConfigSistema</class>
+		<class>br.com.citel.monitoramento.entity.CFGSIS</class>
+		<class>br.com.citel.monitoramento.entity.CONTLO</class>
+		<class>br.com.citel.monitoramento.entity.CONTMO</class>
 		<properties>
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />
@@ -18,6 +20,9 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>br.com.citel.monitoramento.entity.LOG_HD</class>
 		<class>br.com.citel.monitoramento.entity.LOGBKP</class>
+		<class>br.com.citel.monitoramento.entity.LOG_DATA</class>
+		<class>br.com.citel.monitoramento.entity.CONTLO</class>
+		<class>br.com.citel.monitoramento.entity.CONTMO</class>
 		<properties>
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />

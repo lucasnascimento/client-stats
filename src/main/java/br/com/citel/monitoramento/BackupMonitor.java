@@ -1,5 +1,14 @@
 package br.com.citel.monitoramento;
 
-public class BackupMonitor {
+import lombok.Setter;
 
+public class BackupMonitor {
+	@Setter
+	private String monitoraBackup;
+	@Setter
+	private String backupPath;
+
+	public void run() {
+		throw new RuntimeException("TODO: Implementação não finalizada");
+	}
 }

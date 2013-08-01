@@ -1,5 +1,12 @@
 package br.com.citel.monitoramento;
 
-public class DatabaseSync {
+import lombok.Setter;
 
+public class DatabaseSync {
+	@Setter
+	private String envidaDados;
+
+	public void run() {
+		throw new RuntimeException("TODO: Implementação não finalizada");
+	}
 }

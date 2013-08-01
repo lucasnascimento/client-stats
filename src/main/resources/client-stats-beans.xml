@@ -107,4 +107,21 @@
 		</property>
 	</bean>
 
+	<bean class="br.com.citel.monitoramento.DatabaseMonitor" init-method="run">
+		<property name="monitoraDatabase" value="%{CFG_MONDTA}"/>
+	</bean>
+
+	<bean class="br.com.citel.monitoramento.BackupMonitor" init-method="run">
+		<property name="monitoraBackup" value="%{CFG_MONBKP}"/>
+		<property name="backupPath" value="${pathBckp}"/>
+	</bean>
+
+	<bean class="br.com.citel.monitoramento.HDMonitor" init-method="run">
+		<property name="monitoraHD" value="%{CFG_MON_HD}"/>
+	</bean>
+
+	<bean class="br.com.citel.monitoramento.DatabaseSync" init-method="run">
+		<property name="enviaDados" value="%{CFG_MONLNO}"/>
+	</bean>
+
 </beans>

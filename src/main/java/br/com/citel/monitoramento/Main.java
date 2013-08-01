@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import br.com.citel.monitoramento.autcom.repository.ConfigSistemaRepository;
-import br.com.citel.monitoramento.entity.ConfigSistema;
+import br.com.citel.monitoramento.entity.CFGSIS;
 import br.com.citel.monitoramento.portal.repository.LogbkpRepository;
 import br.com.citel.monitoramento.portal.repository.LoghdRepository;
 
@@ -17,7 +17,7 @@ public class Main {
 		ApplicationContext appContext = new ClassPathXmlApplicationContext("client-stats-beans.xml");
 		
 		ConfigSistemaRepository configSistemaRepository = appContext.getBean(ConfigSistemaRepository.class);
-		ConfigSistema cfgsis = configSistemaRepository.getConfigSistema("001", "CFG_MONRLR");
+		CFGSIS cfgsis = configSistemaRepository.getConfigSistema("001", "CFG_MONRLR");
 		System.out.println(cfgsis);
 
 		LogbkpRepository logbkpRepository = appContext.getBean(LogbkpRepository.class);
