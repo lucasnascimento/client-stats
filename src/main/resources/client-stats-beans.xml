@@ -63,8 +63,6 @@
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="persistenceXmlLocation" value="classpath:persistence.xml" />
 		<property name="persistenceUnitName" value="autcomPU" />
-		<!-- <property name="persistenceUnitManager" ref="persistenceUnitManager" 
-			/> -->
 		<property name="dataSource" ref="autcomDS" />
 		<property name="jpaProperties">
 			<props>
@@ -99,8 +97,6 @@
 		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="persistenceXmlLocation" value="classpath:persistence.xml" />
 		<property name="persistenceUnitName" value="portalPU" />
-		<!-- <property name="persistenceUnitManager" ref="persistenceUnitManager" 
-			/> -->
 		<property name="dataSource" ref="portalDS" />
 		<property name="jpaProperties">
 			<props>
@@ -110,17 +106,5 @@
 			</props>
 		</property>
 	</bean>
-
-
-	<bean id="persistenceUnitManager"
-		class="org.springframework.orm.jpa.persistenceunit.DefaultPersistenceUnitManager">
-		<property name="dataSources">
-			<map>
-				<entry key="d1" value-ref="autcomDS" />
-				<entry key="d2" value-ref="portalDS" />
-			</map>
-		</property>
-	</bean>
-
 
 </beans>

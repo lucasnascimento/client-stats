@@ -6,7 +6,7 @@
 
 	<persistence-unit name="autcomPU" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>br.com.citel.monitoramento.autcom.entity.ConfigSistema</class>
+		<class>br.com.citel.monitoramento.entity.ConfigSistema</class>
 		<properties>
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />
@@ -16,8 +16,8 @@
 
 	<persistence-unit name="portalPU" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>br.com.citel.monitoramento.portal.entity.LOG_HD</class>
-		<class>br.com.citel.monitoramento.portal.entity.LOGBKP</class>
+		<class>br.com.citel.monitoramento.entity.LOG_HD</class>
+		<class>br.com.citel.monitoramento.entity.LOGBKP</class>
 		<properties>
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />

@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import br.com.citel.monitoramento.autcom.entity.ConfigSistema;
+import br.com.citel.monitoramento.entity.ConfigSistema;
 
 @Repository
 public interface ConfigSistemaRepository extends CrudRepository<ConfigSistema, Long> {

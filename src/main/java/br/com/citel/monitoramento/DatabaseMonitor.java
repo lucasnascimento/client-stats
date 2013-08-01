@@ -28,7 +28,7 @@ import br.com.citel.monitoramento.util.DBConnection;
  * 
  */
 @Log
-public class Monitor {
+public class DatabaseMonitor {
 
 	private static List<DatabaseTicket> dbTicketList = new ArrayList<DatabaseTicket>();
 

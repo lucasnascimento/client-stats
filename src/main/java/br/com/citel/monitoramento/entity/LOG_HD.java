@@ -1,4 +1,4 @@
-package br.com.citel.monitoramento.portal.entity;
+package br.com.citel.monitoramento.entity;
 
 import java.io.Serializable;
 

@@ -8,7 +8,7 @@ import org.apache.commons.dbutils.DbUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import br.com.citel.monitoramento.Monitor;
+import br.com.citel.monitoramento.DatabaseMonitor;
 import br.com.citel.monitoramento.model.DatabaseTicket;
 import br.com.citel.monitoramento.util.DBConnection;
 import br.com.citel.monitoramento.util.ScriptRunner;
@@ -32,7 +32,7 @@ public class MonitorTest {
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(NO_PROBLEM);
 		DbUtils.closeQuietly(testConn);
-		List<DatabaseTicket> dbTckets = Monitor.processDatabaseValidation();
+		List<DatabaseTicket> dbTckets = DatabaseMonitor.processDatabaseValidation();
 		Assert.assertTrue(dbTckets.isEmpty());
 	}
 
@@ -42,7 +42,7 @@ public class MonitorTest {
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(NEW_TABLE2_ON_SOURCE);
 		DbUtils.closeQuietly(testConn);
-		List<DatabaseTicket> dbTckets = Monitor.processDatabaseValidation();
+		List<DatabaseTicket> dbTckets = DatabaseMonitor.processDatabaseValidation();
 		Assert.assertTrue(dbTckets.size() == 1);
 	}
 
@@ -52,7 +52,7 @@ public class MonitorTest {
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(LEFT_TABLE2_ON_TARGE);
 		DbUtils.closeQuietly(testConn);
-		List<DatabaseTicket> dbTckets = Monitor.processDatabaseValidation();
+		List<DatabaseTicket> dbTckets = DatabaseMonitor.processDatabaseValidation();
 		Assert.assertTrue(dbTckets.size() == 1);
 	}
 
@@ -62,7 +62,7 @@ public class MonitorTest {
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(FIELD_PROBLEM);
 		DbUtils.closeQuietly(testConn);
-		List<DatabaseTicket> dbTckets = Monitor.processDatabaseValidation();
+		List<DatabaseTicket> dbTckets = DatabaseMonitor.processDatabaseValidation();
 		Assert.assertTrue(dbTckets.size() == 3);
 	}
 
@@ -72,7 +72,7 @@ public class MonitorTest {
 		ScriptRunner scriptRunner = new ScriptRunner(testConn, true, true);
 		scriptRunner.runScriptFromClasspath(INDEX_PROBLEM);
 		DbUtils.closeQuietly(testConn);
-		List<DatabaseTicket> dbTckets = Monitor.processDatabaseValidation();
+		List<DatabaseTicket> dbTckets = DatabaseMonitor.processDatabaseValidation();
 		Assert.assertTrue(dbTckets.size() == 3);
 	}
 
