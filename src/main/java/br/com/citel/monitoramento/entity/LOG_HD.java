@@ -1,15 +1,14 @@
 package br.com.citel.monitoramento.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 import lombok.Data;
 
 @Entity
-public @Data class LOG_HD implements Serializable{
-	private static final long serialVersionUID = -3057898700975787177L;
+@IdClass(LOG_HDPK.class)
+public @Data class LOG_HD{
 	@Id
 	private String LOG_SISARQ;
 	@Id

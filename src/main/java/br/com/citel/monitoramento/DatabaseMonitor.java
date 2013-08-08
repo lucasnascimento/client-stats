@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import lombok.Setter;
 import lombok.extern.java.Log;
 
@@ -16,7 +18,6 @@ import br.com.citel.monitoramento.model.DatabaseTicket;
 import br.com.citel.monitoramento.model.Field;
 import br.com.citel.monitoramento.model.Index;
 import br.com.citel.monitoramento.model.Table;
-import br.com.citel.monitoramento.util.DBConnection;
 
 /**
  * A empresa Citel precisa de um software que monitore e armazene estatísticas
@@ -29,9 +30,17 @@ import br.com.citel.monitoramento.util.DBConnection;
  */
 @Log
 public class DatabaseMonitor {
+
 	@Setter
 	private String monitoraDatabase;
+	
+	@Setter
+	private DataSource sourceDataSource;
 
+	@Setter
+	private DataSource targetDataSource;
+
+	
 	private static List<DatabaseTicket> dbTicketList = new ArrayList<DatabaseTicket>();
 
 	public void run() throws SQLException {
@@ -44,11 +53,11 @@ public class DatabaseMonitor {
 
 	}
 
-	public static List<DatabaseTicket> processDatabaseValidation() throws SQLException {
+	public List<DatabaseTicket> processDatabaseValidation() throws SQLException {
 		dbTicketList.clear();
-		Connection connSource = DBConnection.getConnectionSource();
+		Connection connSource = sourceDataSource.getConnection();
 		List<Table> tableSource = loadTables(connSource);
-		Connection connTarget = DBConnection.getConnectionTarget();
+		Connection connTarget = targetDataSource.getConnection();
 		List<Table> tableTarget = loadTables(connTarget);
 		DbUtils.close(connSource);
 		DbUtils.close(connTarget);

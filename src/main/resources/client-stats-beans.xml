@@ -107,21 +107,43 @@
 		</property>
 	</bean>
 
-	<bean class="br.com.citel.monitoramento.DatabaseMonitor" init-method="run">
-		<property name="monitoraDatabase" value="%{CFG_MONDTA}"/>
+	<bean id="sourceDS" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl"
+			value="jdbc:mysql://%{CFG_IP_CIT}:%{CFG_PORCIT}/%{AUTCOM_VERSAO}" />
+		<property name="user" value="%{CFG_USUCIT}" />
+		<property name="password" value="%{CFG_PASCIT}" />
+		<property name="maxStatements" value="500" />
+		<property name="maxIdleTime" value="1800" />
+		<property name="maxPoolSize" value="50" />
+		<property name="minPoolSize" value="5" />
+		<property name="initialPoolSize" value="5" />
+		<property name="acquireIncrement" value="3" />
+		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 
-	<bean class="br.com.citel.monitoramento.BackupMonitor" init-method="run">
-		<property name="monitoraBackup" value="%{CFG_MONBKP}"/>
-		<property name="backupPath" value="${pathBckp}"/>
+	<bean class="br.com.citel.monitoramento.DatabaseMonitor"
+		init-method="run">
+		<property name="monitoraDatabase" value="%{CFG_MONDTA}" />
+		<property name="sourceDataSource" ref="sourceDS" />
+		<property name="targetDataSource" ref="autcomDS" />
+	</bean>
+
+	<bean class="br.com.citel.monitoramento.BackupMonitor"
+		init-method="run">
+		<property name="monitoraBackup" value="%{CFG_MONBKP}" />
+		<property name="backupPath" value="${pathBckp}" />
+		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}" />
 	</bean>
 
 	<bean class="br.com.citel.monitoramento.HDMonitor" init-method="run">
-		<property name="monitoraHD" value="%{CFG_MON_HD}"/>
+		<property name="monitoraHD" value="%{CFG_MON_HD}" />
+		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}"></property>
 	</bean>
 
 	<bean class="br.com.citel.monitoramento.DatabaseSync" init-method="run">
-		<property name="enviaDados" value="%{CFG_MONLNO}"/>
+		<property name="enviaDados" value="%{CFG_MONLNO}" />
 	</bean>
 
 </beans>
