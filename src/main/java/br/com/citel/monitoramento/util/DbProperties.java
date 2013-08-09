@@ -1,5 +1,6 @@
 package br.com.citel.monitoramento.util;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -8,7 +9,7 @@ import javax.sql.DataSource;
 
 import lombok.extern.java.Log;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Log
 public class DbProperties extends Properties {
@@ -16,33 +17,23 @@ public class DbProperties extends Properties {
 
 	public DbProperties(DataSource dataSource, String empresaFisica) {
 		super();
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		
+		NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+		Map<String,String> parameters = new HashMap<String, String>();
+		StringBuilder sql = new StringBuilder();
 
-		List<Map<String, Object>> l = jdbcTemplate.queryForList("select sis_codcfg, sis_valcfg from CFGSIS where sis_codemp = ? and sis_grucfg = 'monitoramento'", new Object[] { empresaFisica });
+		sql.append("select SIS_CODCFG AS CHAVE, SIS_VALCFG AS VALOR from CFGSIS where SIS_CODEMP = :empFisica and SIS_GRUCFG = 'monitoramento'").append(" union")
+				.append(" select 'AUTCOM_VERSAO', INF_VERARQ from INFSIS where INF_NOMARQ = 'autcom.exe'").append(" union")
+				.append(" select 'EMP_C_G_C_', EMP_C_G_C_ from CADEMP WHERE EMP_CODEMP = :empFisica");
 
-		for (Map<String, Object> m : l) {
-			log.info(String.format("Loading from DB: [{%s}:{%s}]", m.get("sis_codcfg"), m.get("sis_valcfg")));
-			setProperty((m.get("sis_codcfg")).toString(), (m.get("sis_valcfg")).toString());
-		}
-
-		l = jdbcTemplate.queryForList("select 'AUTCOM_VERSAO', INF_VERARQ from INFSIS where INF_NOMARQ = 'autcom.exe'");
-
-		if (l.isEmpty()) {
-			setProperty("AUTCOM_VERSAO", "AUTCOM");
-		} else {
-			for (Map<String, Object> m : l) {
-				log.info(String.format("Loading from DB: [{%s}:{%s}]", m.get("AUTCOM_VERSAO"), m.get("INF_VERARQ")));
-				String infVersaoArquivo = "AUTCOM_" + (m.get("INF_VERARQ")).toString().replace('.', '_');
-				setProperty((m.get("AUTCOM_VERSAO")).toString(), (infVersaoArquivo));
-			}
-		}
-
-		l = jdbcTemplate.queryForList("select EMP_C_G_C_ from CADEMP WHERE EMP_CODEMP = ?", new Object[] { empresaFisica });
+		parameters.put("empFisica", empresaFisica);
+		List<Map<String, Object>> l = jdbcTemplate.queryForList(sql.toString(), parameters);
 
 		for (Map<String, Object> m : l) {
-			log.info(String.format("Loading from DB: [{EMP_C_G_C_}:{%s}]", m.get("EMP_C_G_C_")));
-			setProperty("EMP_C_G_C_", (m.get("EMP_C_G_C_")).toString());
+			log.info(String.format("Loading from DB: [{%s}:{%s}]", m.get("CHAVE"), m.get("VALOR")));
+			setProperty((m.get("CHAVE")).toString(), (m.get("VALOR")).toString());
 		}
+
 
 	}
 }
