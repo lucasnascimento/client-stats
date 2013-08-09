@@ -1,4 +1,4 @@
-package br.com.citel.monitoramento.portal.repository;
+package br.com.citel.monitoramento.repository.portal;
 
 import java.util.List;
 

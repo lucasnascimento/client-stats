@@ -7,12 +7,12 @@ import lombok.extern.java.Log;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import br.com.citel.monitoramento.autcom.repository.ContloAutComRepository;
-import br.com.citel.monitoramento.autcom.repository.ContmoAutComRepository;
 import br.com.citel.monitoramento.entity.CONTLO;
 import br.com.citel.monitoramento.entity.CONTMO;
-import br.com.citel.monitoramento.portal.repository.ContloPortalRepository;
-import br.com.citel.monitoramento.portal.repository.ContmoPortalRepository;
+import br.com.citel.monitoramento.repository.autcom.ContloAutComRepository;
+import br.com.citel.monitoramento.repository.autcom.ContmoAutComRepository;
+import br.com.citel.monitoramento.repository.portal.ContloPortalRepository;
+import br.com.citel.monitoramento.repository.portal.ContmoPortalRepository;
 
 @Log
 public class DatabaseSync {

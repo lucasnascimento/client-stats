@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.citel.monitoramento.entity.LOGBKP;
-import br.com.citel.monitoramento.portal.repository.LogbkpRepository;
+import br.com.citel.monitoramento.repository.portal.LogbkpRepository;
 
 @Log
 public class BackupMonitor {

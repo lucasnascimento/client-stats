@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.citel.monitoramento.entity.LOG_HD;
-import br.com.citel.monitoramento.portal.repository.LoghdRepository;
+import br.com.citel.monitoramento.repository.portal.LoghdRepository;
 
 import lombok.Setter;
 import lombok.extern.java.Log;

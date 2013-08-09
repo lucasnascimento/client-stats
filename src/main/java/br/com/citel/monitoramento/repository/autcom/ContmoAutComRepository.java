@@ -1,4 +1,4 @@
-package br.com.citel.monitoramento.autcom.repository;
+package br.com.citel.monitoramento.repository.autcom;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

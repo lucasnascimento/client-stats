@@ -12,12 +12,12 @@
 	<context:component-scan base-package="br.com.citel.monitoramento" />
 	<tx:annotation-driven />
 
-	<jpa:repositories base-package="br.com.citel.monitoramento.autcom.repository"
+	<jpa:repositories base-package="br.com.citel.monitoramento.repository.autcom"
 		entity-manager-factory-ref="autcomEntityManagerFactory"
 		transaction-manager-ref="autcomTM">
 	</jpa:repositories>
 
-	<jpa:repositories base-package="br.com.citel.monitoramento.portal.repository"
+	<jpa:repositories base-package="br.com.citel.monitoramento.repository.portal"
 		entity-manager-factory-ref="portalEntityManagerFactory"
 		transaction-manager-ref="portalTM">
 	</jpa:repositories>
