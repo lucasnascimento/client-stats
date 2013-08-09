@@ -26,9 +26,12 @@ public class BackupMonitor {
 	private LogbkpRepository logbkpRepository;
 
 	public void run() {
-		log.info("Monitoramento inicio: LOGBKP");
-		processLogBackup();
-		log.info("Monitoramento fim: LOGBKP");
+		if ("1".equals(monitoraBackup)) {
+			processLogBackup();
+			log.info("MONITORAMENTO BACKUP FEITO.");
+		}else{
+			log.info("MONITORAMENTO BACKUP DESLIGADO.");
+		}
 	}
 
 	public void processLogBackup() {

@@ -144,6 +144,8 @@
 
 	<bean class="br.com.citel.monitoramento.DatabaseSync" init-method="run">
 		<property name="enviaDados" value="%{CFG_MONLNO}" />
+		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}"></property>
+		<property name="empresaFisica" value="001" />
 	</bean>
 
 </beans>

@@ -1,17 +1,18 @@
 package br.com.citel.monitoramento.entity;
 
-import java.io.Serializable;
 import java.sql.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 
 import lombok.Data;
 
 @Entity
+@IdClass(CONTLOPK.class)
+
 public @Data
-class CONTLO implements Serializable {
-	private static final long serialVersionUID = 6820327725672597892L;
+class CONTLO{
 	@Id
 	private String LOG_C_G_C_;
 	@Id
