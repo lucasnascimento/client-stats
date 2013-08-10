@@ -6,7 +6,6 @@
 
 	<persistence-unit name="autcomPU" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-		<class>br.com.citel.monitoramento.entity.CFGSIS</class>
 		<class>br.com.citel.monitoramento.entity.CONTLO</class>
 		<class>br.com.citel.monitoramento.entity.CONTMO</class>
 		<properties>

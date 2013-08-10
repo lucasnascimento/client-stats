@@ -128,6 +128,7 @@
 		<property name="monitoraDatabase" value="%{CFG_MONDTA}" />
 		<property name="sourceDataSource" ref="sourceDS" />
 		<property name="targetDataSource" ref="autcomDS" />
+		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}"></property>
 	</bean>
 
 	<bean class="br.com.citel.monitoramento.BackupMonitor"

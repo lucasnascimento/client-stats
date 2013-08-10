@@ -10,7 +10,8 @@ import lombok.Data;
 
 @Entity
 @IdClass(CONTMOPK.class)
-public @Data class CONTMO{
+public @Data
+class CONTMO {
 	@Id
 	private String TABELA;
 	@Id

@@ -13,11 +13,15 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import br.com.citel.monitoramento.entity.LOG_DATA;
 import br.com.citel.monitoramento.model.DatabaseTicket;
 import br.com.citel.monitoramento.model.Field;
 import br.com.citel.monitoramento.model.Index;
 import br.com.citel.monitoramento.model.Table;
+import br.com.citel.monitoramento.repository.portal.LogdataRepository;
 
 /**
  * A empresa Citel precisa de um software que monitore e armazene estatísticas
@@ -33,91 +37,108 @@ public class DatabaseMonitor {
 
 	@Setter
 	private String monitoraDatabase;
-	
+
+	@Setter
+	private String cnpjEmpresa;
+
 	@Setter
 	private DataSource sourceDataSource;
 
 	@Setter
 	private DataSource targetDataSource;
-
 	
+	@Autowired
+	private LogdataRepository logdataRepository;  
+
 	private static List<DatabaseTicket> dbTicketList = new ArrayList<DatabaseTicket>();
 
 	public void run() throws SQLException {
-		processDatabaseValidation();
-
-		// TODO: Implementar processo de gração no banco de dados dos tickets
-		for (DatabaseTicket dbticket : dbTicketList) {
-			log.info(dbticket.toString());
+		if ("1".equals(monitoraDatabase)) {
+			processDatabaseMonitor();
+			log.info("MONITORAMENTO DATABASE FEITO.");
+		} else {
+			log.info("MONITORAMENTO DATABASE DESLIGADO.");
 		}
-
 	}
 
-	public List<DatabaseTicket> processDatabaseValidation() throws SQLException {
+	public void processDatabaseMonitor() throws SQLException {
 		dbTicketList.clear();
 		Connection connSource = sourceDataSource.getConnection();
-		List<Table> tableSource = loadTables(connSource);
+		List<Table> tableSourceList = loadTables(connSource);
 		Connection connTarget = targetDataSource.getConnection();
-		List<Table> tableTarget = loadTables(connTarget);
-		DbUtils.close(connSource);
-		DbUtils.close(connTarget);
-		compareTable(tableSource, tableTarget);
-		return dbTicketList;
+		List<Table> tableTargetList = loadTables(connTarget);
+		compareTable(tableSourceList, tableTargetList);
+
+		for (DatabaseTicket dbTicket : dbTicketList) {
+			LOG_DATA logData = new LOG_DATA();
+			logData.setLOG_C_G_C_(cnpjEmpresa);
+			logData.setLOG_TABELA(dbTicket.getTableName());
+			logData.setLOG_MENSAGEM(dbTicket.getSubject());
+			logdataRepository.save(logData);
+		}
 	}
 
-	private static void compareTable(List<Table> tableSourceList, List<Table> tableTargetList) {
-
+	private void compareTable(List<Table> tableSourceList, List<Table> tableTargetList) {
 		for (Table tableSource : tableSourceList) {
 			int tableTargetIndex = tableTargetList.indexOf((tableSource));
 			if (tableTargetIndex < 0) {
-				dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), "table not found on target database"));
+				dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), "TABELA NÃO ENCONTRADA NO DATABASE DESTINO"));
 			} else {
 				Table tableTarget = tableTargetList.remove(tableTargetIndex);
 				compareField(tableSource.getTableName(), tableSource.getFields(), tableTarget.getFields());
 				compareIndex(tableSource.getTableName(), tableSource.getIndexes(), tableTarget.getIndexes());
 			}
-
 		}
 		for (Table tableTarget : tableTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(), "table not found on source"));
+			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(), "TABELA NÃO ENCONTRADA NO DATABASE MODELO"));
 		}
 	}
 
-	private static void compareField(String tableName, List<Field> fieldSourceList, List<Field> fieldTargetList) {
+	private void compareField(String tableName, List<Field> fieldSourceList, List<Field> fieldTargetList) {
 		for (Field fieldSource : fieldSourceList) {
 			int fieldTargetIndex = fieldTargetList.indexOf(fieldSource);
 			if (fieldTargetIndex < 0) {
-				dbTicketList.add(new DatabaseTicket(tableName, String.format("field not found on target table: %s", fieldSource.getFieldName())));
+				dbTicketList.add(new DatabaseTicket(tableName, String.format("CAMPO NÃO ENCONTRADO NO DATABASE DESTINO: %s", fieldSource.getFieldName())));
 			} else {
 				Field fieldTarget = fieldTargetList.remove(fieldTargetIndex);
-				if (!fieldTarget.getType().equalsIgnoreCase(fieldSource.getType())) {
-					dbTicketList.add(new DatabaseTicket(tableName, String.format("field target's type inconsistency: Source: %s %s Target: %s %s ", fieldSource.getFieldName(), fieldSource.getType(), fieldTarget.getFieldName(), fieldTarget.getType())));
+				if (!StringUtils.equals(fieldTarget.getType(),fieldSource.getType())) {
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("TIPO DE DADOS INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getType(),
+							fieldTarget.getFieldName(), fieldTarget.getType())));
+				}
+				if(!StringUtils.equals(fieldTarget.getDef(), fieldSource.getDef())){
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("DEFAUL INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getDef(),
+							fieldTarget.getFieldName(), fieldTarget.getDef())));
+				}
+				if (fieldTarget.getNullable() != fieldSource.getNullable()) {
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("NULL INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getNullable(),
+							fieldTarget.getFieldName(), fieldTarget.getNullable())));
 				}
 			}
 		}
 		for (Field fieldTarget : fieldTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableName, String.format("field not found on source table: %s", fieldTarget.getFieldName())));
+			dbTicketList.add(new DatabaseTicket(tableName, String.format("CAMPO NÃO ENCONTRADO NO MODELO: %s", fieldTarget.getFieldName())));
 		}
 	}
 
-	private static void compareIndex(String tableName, List<Index> indexSourceList, List<Index> indexTargetList) {
+	private void compareIndex(String tableName, List<Index> indexSourceList, List<Index> indexTargetList) {
 		for (Index indexSource : indexSourceList) {
 			int indexTargetIndex = indexTargetList.indexOf(indexSource);
 			if (indexTargetIndex < 0) {
-				dbTicketList.add(new DatabaseTicket(tableName, String.format("index target not found: %s", indexSource.getIndexName())));
+				dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NÃO ENCONTRADO NO DESTINO: %s", indexSource.getIndexName())));
 			} else {
 				Index indexTarget = indexTargetList.remove(indexTargetIndex);
-				if (!indexTarget.getColumnName().equalsIgnoreCase(indexSource.getColumnName())) {
-					dbTicketList.add(new DatabaseTicket(tableName, String.format("index target's columns inconsistency: Source: %s %s Target: %s %s ", indexSource.getIndexName(), indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
+				if (!StringUtils.equals(indexTarget.getColumnName(),indexSource.getColumnName())) {
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("INCONSISTÊNCIA DE COLUNAS NO INDÍCE: MODELO: %s %s DESTINO: %s %s ", indexSource.getIndexName(),
+							indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
 				}
 			}
 		}
 		for (Index indexTarget : indexTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableName, String.format("index not found on source table: %s", indexTarget.getIndexName())));
+			dbTicketList.add(new DatabaseTicket(tableName, String.format("INDÍCE NÃO ENCONTRADO NO MODELO: %s", indexTarget.getIndexName())));
 		}
 	}
 
-	private static List<Table> loadTables(Connection conn) {
+	private List<Table> loadTables(Connection conn) {
 		PreparedStatement pstm;
 		ResultSet rs;
 		List<Table> tables = new ArrayList<Table>();
@@ -127,11 +148,9 @@ public class DatabaseMonitor {
 			while (rs.next()) {
 
 				String tableName = rs.getString(1);
-				log.finest("TABELA - Carregando: ".concat(tableName));
 				List<Field> fields = loadFields(conn, tableName);
 				List<Index> indexes = loadIndexes(conn, tableName);
 				tables.add(new Table(tableName, fields, indexes));
-				log.finest("TABELA - Carregada: ".concat(tableName));
 			}
 			DbUtils.closeQuietly(rs);
 			DbUtils.closeQuietly(pstm);
@@ -141,7 +160,7 @@ public class DatabaseMonitor {
 		return tables;
 	}
 
-	private static List<Field> loadFields(Connection conn, String tableName) {
+	private List<Field> loadFields(Connection conn, String tableName) {
 		PreparedStatement pstm;
 		ResultSet rs;
 		List<Field> fields = new ArrayList<Field>();
@@ -150,15 +169,13 @@ public class DatabaseMonitor {
 			rs = pstm.executeQuery();
 
 			while (rs.next()) {
-				String fieldName = rs.getString("field");
-				String type = rs.getString("type");
+				String fieldName = StringUtils.upperCase(rs.getString("field"));
+				String type = StringUtils.upperCase(rs.getString("type"));
 				Boolean nullable = rs.getString("null").equalsIgnoreCase("YES") ? true : false;
-				String key = rs.getString("key");
-				String def = rs.getString("default");
-				String extra = rs.getString("extra");
-
+				String key = StringUtils.upperCase(rs.getString("key"));
+				String def = StringUtils.upperCase(rs.getString("default"));
+				String extra = StringUtils.upperCase(rs.getString("extra"));
 				fields.add(new Field(fieldName, type, nullable, key, def, extra));
-
 			}
 			DbUtils.closeQuietly(rs);
 			DbUtils.closeQuietly(pstm);
@@ -168,20 +185,17 @@ public class DatabaseMonitor {
 		return fields;
 	}
 
-	private static List<Index> loadIndexes(Connection conn, String tableName) {
+	private List<Index> loadIndexes(Connection conn, String tableName) {
 		PreparedStatement pstm;
 		ResultSet rs;
 		List<Index> indexes = new ArrayList<Index>();
 		try {
 			pstm = conn.prepareStatement("show index from " + tableName + ";");
 			rs = pstm.executeQuery();
-
 			while (rs.next()) {
-				String indexName = rs.getString("Key_name");
-				String columnName = rs.getString("Column_name");
-
+				String indexName = StringUtils.upperCase(rs.getString("Key_name"));
+				String columnName = StringUtils.upperCase(rs.getString("Column_name"));
 				indexes.add(new Index(indexName, columnName));
-
 			}
 			DbUtils.closeQuietly(rs);
 			DbUtils.closeQuietly(pstm);
@@ -190,4 +204,5 @@ public class DatabaseMonitor {
 		}
 		return indexes;
 	}
+	
 }
