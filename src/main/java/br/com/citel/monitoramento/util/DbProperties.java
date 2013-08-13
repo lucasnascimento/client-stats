@@ -18,6 +18,7 @@ public class DbProperties extends Properties {
 	public DbProperties(DataSource dataSource, String empresaFisica) {
 		super();
 		
+		 
 		NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 		Map<String,String> parameters = new HashMap<String, String>();
 		StringBuilder sql = new StringBuilder();

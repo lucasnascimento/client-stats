@@ -1,20 +1,17 @@
 package br.com.citel.monitoramento;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import lombok.Setter;
 import lombok.extern.java.Log;
 
-import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import br.com.citel.monitoramento.entity.LOG_DATA;
 import br.com.citel.monitoramento.model.DatabaseTicket;
@@ -41,14 +38,14 @@ public class DatabaseMonitor {
 	@Setter
 	private String cnpjEmpresa;
 
-	@Setter
-	private DataSource sourceDataSource;
-
-	@Setter
-	private DataSource targetDataSource;
-	
 	@Autowired
-	private LogdataRepository logdataRepository;  
+	private LogdataRepository logdataRepository;
+
+	@Autowired
+	private JdbcTemplate sourceJdbcTemplate;
+
+	@Autowired
+	private JdbcTemplate targetJdbcTemplate;
 
 	private static List<DatabaseTicket> dbTicketList = new ArrayList<DatabaseTicket>();
 
@@ -63,10 +60,8 @@ public class DatabaseMonitor {
 
 	public void processDatabaseMonitor() throws SQLException {
 		dbTicketList.clear();
-		Connection connSource = sourceDataSource.getConnection();
-		List<Table> tableSourceList = loadTables(connSource);
-		Connection connTarget = targetDataSource.getConnection();
-		List<Table> tableTargetList = loadTables(connTarget);
+		List<Table> tableSourceList = loadTables(sourceJdbcTemplate);
+		List<Table> tableTargetList = loadTables(targetJdbcTemplate);
 		compareTable(tableSourceList, tableTargetList);
 
 		for (DatabaseTicket dbTicket : dbTicketList) {
@@ -101,11 +96,11 @@ public class DatabaseMonitor {
 				dbTicketList.add(new DatabaseTicket(tableName, String.format("CAMPO NÃO ENCONTRADO NO DATABASE DESTINO: %s", fieldSource.getFieldName())));
 			} else {
 				Field fieldTarget = fieldTargetList.remove(fieldTargetIndex);
-				if (!StringUtils.equals(fieldTarget.getType(),fieldSource.getType())) {
+				if (!StringUtils.equals(fieldTarget.getType(), fieldSource.getType())) {
 					dbTicketList.add(new DatabaseTicket(tableName, String.format("TIPO DE DADOS INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getType(),
 							fieldTarget.getFieldName(), fieldTarget.getType())));
 				}
-				if(!StringUtils.equals(fieldTarget.getDef(), fieldSource.getDef())){
+				if (!StringUtils.equals(fieldTarget.getDef(), fieldSource.getDef())) {
 					dbTicketList.add(new DatabaseTicket(tableName, String.format("DEFAUL INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getDef(),
 							fieldTarget.getFieldName(), fieldTarget.getDef())));
 				}
@@ -127,7 +122,7 @@ public class DatabaseMonitor {
 				dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NÃO ENCONTRADO NO DESTINO: %s", indexSource.getIndexName())));
 			} else {
 				Index indexTarget = indexTargetList.remove(indexTargetIndex);
-				if (!StringUtils.equals(indexTarget.getColumnName(),indexSource.getColumnName())) {
+				if (!StringUtils.equals(indexTarget.getColumnName(), indexSource.getColumnName())) {
 					dbTicketList.add(new DatabaseTicket(tableName, String.format("INCONSISTÊNCIA DE COLUNAS NO INDÍCE: MODELO: %s %s DESTINO: %s %s ", indexSource.getIndexName(),
 							indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
 				}
@@ -138,71 +133,40 @@ public class DatabaseMonitor {
 		}
 	}
 
-	private List<Table> loadTables(Connection conn) {
-		PreparedStatement pstm;
-		ResultSet rs;
-		List<Table> tables = new ArrayList<Table>();
-		try {
-			pstm = conn.prepareStatement("show tables;");
-			rs = pstm.executeQuery();
-			while (rs.next()) {
-
+	private List<Table> loadTables(final JdbcTemplate jdbcTemplate) {
+		return jdbcTemplate.query("show tables", new RowMapper<Table>() {
+			@Override
+			public Table mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String tableName = rs.getString(1);
-				List<Field> fields = loadFields(conn, tableName);
-				List<Index> indexes = loadIndexes(conn, tableName);
-				tables.add(new Table(tableName, fields, indexes));
+				return new Table(tableName, loadFields(jdbcTemplate, tableName), loadIndexes(jdbcTemplate, tableName));
 			}
-			DbUtils.closeQuietly(rs);
-			DbUtils.closeQuietly(pstm);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return tables;
+		});
 	}
 
-	private List<Field> loadFields(Connection conn, String tableName) {
-		PreparedStatement pstm;
-		ResultSet rs;
-		List<Field> fields = new ArrayList<Field>();
-		try {
-			pstm = conn.prepareStatement("show columns from " + tableName + ";");
-			rs = pstm.executeQuery();
-
-			while (rs.next()) {
+	private List<Field> loadFields(final JdbcTemplate jdbcTemplate, final String tableName) {
+		return jdbcTemplate.query("show columns from " + tableName, new RowMapper<Field>() {
+			@Override
+			public Field mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String fieldName = StringUtils.upperCase(rs.getString("field"));
 				String type = StringUtils.upperCase(rs.getString("type"));
 				Boolean nullable = rs.getString("null").equalsIgnoreCase("YES") ? true : false;
 				String key = StringUtils.upperCase(rs.getString("key"));
 				String def = StringUtils.upperCase(rs.getString("default"));
 				String extra = StringUtils.upperCase(rs.getString("extra"));
-				fields.add(new Field(fieldName, type, nullable, key, def, extra));
+				return new Field(fieldName, type, nullable, key, def, extra);
 			}
-			DbUtils.closeQuietly(rs);
-			DbUtils.closeQuietly(pstm);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return fields;
+		});
 	}
 
-	private List<Index> loadIndexes(Connection conn, String tableName) {
-		PreparedStatement pstm;
-		ResultSet rs;
-		List<Index> indexes = new ArrayList<Index>();
-		try {
-			pstm = conn.prepareStatement("show index from " + tableName + ";");
-			rs = pstm.executeQuery();
-			while (rs.next()) {
+	private List<Index> loadIndexes(final JdbcTemplate jdbcTemplate, final String tableName) {
+		return jdbcTemplate.query("show index from  " + tableName, new RowMapper<Index>() {
+			@Override
+			public Index mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String indexName = StringUtils.upperCase(rs.getString("Key_name"));
 				String columnName = StringUtils.upperCase(rs.getString("Column_name"));
-				indexes.add(new Index(indexName, columnName));
+				return new Index(indexName, columnName);
 			}
-			DbUtils.closeQuietly(rs);
-			DbUtils.closeQuietly(pstm);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return indexes;
+		});
 	}
-	
+
 }

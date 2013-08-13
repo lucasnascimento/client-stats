@@ -89,6 +89,8 @@
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 
+
+
 	<bean id="portalTM" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="portalEntityManagerFactory" />
 	</bean>
@@ -122,12 +124,19 @@
 		<property name="acquireIncrement" value="3" />
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
+	
+	<bean id="sourceJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg type="javax.sql.DataSource" ref="sourceDS"/>
+	</bean>
+
+	<bean id="targetJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg type="javax.sql.DataSource" ref="autcomDS"/>
+	</bean>
+
 
 	<bean class="br.com.citel.monitoramento.DatabaseMonitor"
 		init-method="run">
 		<property name="monitoraDatabase" value="%{CFG_MONDTA}" />
-		<property name="sourceDataSource" ref="sourceDS" />
-		<property name="targetDataSource" ref="autcomDS" />
 		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}"></property>
 	</bean>
 
