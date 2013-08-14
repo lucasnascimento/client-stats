@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import br.com.citel.monitoramento.entity.LOG_DATA;
+import br.com.citel.monitoramento.entity.LOG_DTA;
 import br.com.citel.monitoramento.model.DatabaseTicket;
 import br.com.citel.monitoramento.model.Field;
 import br.com.citel.monitoramento.model.Index;
@@ -26,8 +26,6 @@ import br.com.citel.monitoramento.repository.portal.LogdataRepository;
  * objetivos inciais deste aplicativoão são:
  * 
  * Monitorar Espaço em Disco Motorar Estrutura de Banco de Dados
- * 
- * 
  */
 @Log
 public class DatabaseMonitor {
@@ -63,9 +61,12 @@ public class DatabaseMonitor {
 		List<Table> tableSourceList = loadTables(sourceJdbcTemplate);
 		List<Table> tableTargetList = loadTables(targetJdbcTemplate);
 		compareTable(tableSourceList, tableTargetList);
+		
+		List<LOG_DTA> logdataList = logdataRepository.findByCNPJ(cnpjEmpresa);
+		logdataRepository.deleteInBatch(logdataList);
 
 		for (DatabaseTicket dbTicket : dbTicketList) {
-			LOG_DATA logData = new LOG_DATA();
+			LOG_DTA logData = new LOG_DTA();
 			logData.setLOG_C_G_C_(cnpjEmpresa);
 			logData.setLOG_TABELA(dbTicket.getTableName());
 			logData.setLOG_MENSAGEM(dbTicket.getSubject());

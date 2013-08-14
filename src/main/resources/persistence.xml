@@ -19,7 +19,7 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<class>br.com.citel.monitoramento.entity.LOG_HD</class>
 		<class>br.com.citel.monitoramento.entity.LOGBKP</class>
-		<class>br.com.citel.monitoramento.entity.LOG_DATA</class>
+		<class>br.com.citel.monitoramento.entity.LOG_DTA</class>
 		<class>br.com.citel.monitoramento.entity.CONTLO</class>
 		<class>br.com.citel.monitoramento.entity.CONTMO</class>
 		<properties>
