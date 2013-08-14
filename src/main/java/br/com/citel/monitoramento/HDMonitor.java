@@ -26,14 +26,12 @@ public class HDMonitor {
 	private LoghdRepository loghdRepository;
 
 	public void run() {
-		log.info("Monitoramento inicio: HDMonitor");
-		processHDMonitor();
-		log.info("Monitoramento fim: HDMonitor");
-	}
-
-	public static void main(String[] args) {
-		HDMonitor monitor = new HDMonitor();
-		monitor.processHDMonitor();
+		if ("1".equals(monitoraHD)) {
+			processHDMonitor();
+			log.info("MONITORAMENTO HD FEITO.");
+		}else{
+			log.info("MONITORAMENTO HD DESLIGADO.");
+		}
 	}
 
 	public void processHDMonitor() {
