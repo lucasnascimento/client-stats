@@ -20,6 +20,7 @@ public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlace
 		DbProperties dbProps = new DbProperties(dataSource, empresaFisica);
 
 		setProperties(dbProps);
+		
 		super.postProcessBeanFactory(beanFactory);
 
 	}

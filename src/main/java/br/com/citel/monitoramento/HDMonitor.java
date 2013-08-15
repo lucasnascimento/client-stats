@@ -29,7 +29,7 @@ public class HDMonitor {
 		if ("1".equals(monitoraHD)) {
 			processHDMonitor();
 			log.info("MONITORAMENTO HD FEITO.");
-		}else{
+		} else {
 			log.info("MONITORAMENTO HD DESLIGADO.");
 		}
 	}

@@ -17,10 +17,9 @@ public class DbProperties extends Properties {
 
 	public DbProperties(DataSource dataSource, String empresaFisica) {
 		super();
-		
-		 
+
 		NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-		Map<String,String> parameters = new HashMap<String, String>();
+		Map<String, String> parameters = new HashMap<String, String>();
 		StringBuilder sql = new StringBuilder();
 
 		sql.append("select SIS_CODCFG AS CHAVE, SIS_VALCFG AS VALOR from CFGSIS where SIS_CODEMP = :empFisica and SIS_GRUCFG = 'monitoramento'").append(" union")
@@ -31,10 +30,21 @@ public class DbProperties extends Properties {
 		List<Map<String, Object>> l = jdbcTemplate.queryForList(sql.toString(), parameters);
 
 		for (Map<String, Object> m : l) {
-			log.info(String.format("Loading from DB: [{%s}:{%s}]", m.get("CHAVE"), m.get("VALOR")));
-			setProperty((m.get("CHAVE")).toString(), (m.get("VALOR")).toString());
-		}
 
+			String chave = (m.get("CHAVE")).toString();
+			String valor = (m.get("VALOR")).toString();
+
+			if ("AUTCOM_VERSAO".equalsIgnoreCase(chave)) {
+				valor = valor.replace(".", "_");
+			}
+
+			log.info(String.format("Loading from DB: [{%s}:{%s}]", chave, valor));
+			setProperty(chave, valor);
+		}
+		
+		if (!containsKey("AUTCOM_VERSAO")){
+			setProperty("AUTCOM_VERSAO", "AUTCOM");
+		}
 
 	}
 }
