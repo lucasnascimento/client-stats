@@ -89,7 +89,8 @@ public class ScriptRunner {
 	/**
 	 * Runs an SQL script loaded from Classpath
 	 * 
-	 * @param scriptFileName - the file name of the script
+	 * @param scriptFileName
+	 *            - the file name of the script
 	 */
 	public void runScriptFromClasspath(String scriptFileName) {
 		BufferedReader reader;
@@ -224,7 +225,7 @@ public class ScriptRunner {
 			printlnError(e);
 			throw e;
 		} finally {
-//			conn.rollback();
+			// conn.rollback();
 			flush();
 		}
 	}

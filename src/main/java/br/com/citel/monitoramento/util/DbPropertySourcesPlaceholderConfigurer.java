@@ -8,6 +8,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
+/**
+ * Classe utilitário para recuperar os dados configuraveis do banco de dados.
+ * Utlizando o SpringFramework
+ * 
+ * @author lucas
+ * 
+ */
 public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlaceholderConfigurer {
 	@Setter
 	protected String empresaFisica;
@@ -20,7 +27,7 @@ public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlace
 		DbProperties dbProps = new DbProperties(dataSource, empresaFisica);
 
 		setProperties(dbProps);
-		
+
 		super.postProcessBeanFactory(beanFactory);
 
 	}

@@ -11,6 +11,12 @@ import lombok.extern.java.Log;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+/**
+ * Classe utilitário para recuperar os dados configuraveis do banco de dados.
+ * 
+ * @author lucas
+ * 
+ */
 @Log
 public class DbProperties extends Properties {
 	private static final long serialVersionUID = 1L;
@@ -41,8 +47,8 @@ public class DbProperties extends Properties {
 			log.info(String.format("Loading from DB: [{%s}:{%s}]", chave, valor));
 			setProperty(chave, valor);
 		}
-		
-		if (!containsKey("AUTCOM_VERSAO")){
+
+		if (!containsKey("AUTCOM_VERSAO")) {
 			setProperty("AUTCOM_VERSAO", "AUTCOM");
 		}
 

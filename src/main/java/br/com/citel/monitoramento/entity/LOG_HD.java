@@ -6,9 +6,18 @@ import javax.persistence.IdClass;
 
 import lombok.Data;
 
+/**
+ * Classe ORM responsável por mapear a entidade de banco de dados, com abordagem
+ * minimalista usando LAMBOK e como nome da classe o proprio nome da entidade no
+ * Banco de Dados.
+ * 
+ * @author lucas
+ * 
+ */
 @Entity
 @IdClass(LOG_HDPK.class)
-public @Data class LOG_HD{
+public @Data
+class LOG_HD {
 	@Id
 	private String LOG_SISARQ;
 	@Id

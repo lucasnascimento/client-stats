@@ -9,6 +9,12 @@ import org.springframework.stereotype.Repository;
 import br.com.citel.monitoramento.entity.LOG_DTA;
 import br.com.citel.monitoramento.entity.LOG_DTAPK;
 
+/**
+ * Classe de repositório usando o SpringFramework para facilidades de CRUD.
+ * 
+ * @author lucas
+ * 
+ */
 @Repository
 public interface LogdataRepository extends JpaRepository<LOG_DTA, LOG_DTAPK> {
 	@Query("select l from LOG_DTA l where l.LOG_C_G_C_ = ?1")

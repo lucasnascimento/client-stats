@@ -21,11 +21,11 @@ import br.com.citel.monitoramento.model.Table;
 import br.com.citel.monitoramento.repository.portal.LogdataRepository;
 
 /**
- * A empresa Citel precisa de um software que monitore e armazene estatísticas
- * de monitoria das instâncias de seu software no ambiene de clientes, os
- * objetivos inciais deste aplicativoão são:
+ * Classe de monitoramento responsável por fazer o monitoramento da extrutura do
+ * Database
  * 
- * Monitorar Espaço em Disco Motorar Estrutura de Banco de Dados
+ * @author lucas
+ * 
  */
 @Log
 public class DatabaseMonitor {
@@ -61,7 +61,7 @@ public class DatabaseMonitor {
 		List<Table> tableSourceList = loadTables(sourceJdbcTemplate);
 		List<Table> tableTargetList = loadTables(targetJdbcTemplate);
 		compareTable(tableSourceList, tableTargetList);
-		
+
 		List<LOG_DTA> logdataList = logdataRepository.findByCNPJ(cnpjEmpresa);
 		logdataRepository.deleteInBatch(logdataList);
 

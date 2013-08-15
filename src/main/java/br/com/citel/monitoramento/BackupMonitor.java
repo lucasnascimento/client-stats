@@ -14,6 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import br.com.citel.monitoramento.entity.LOGBKP;
 import br.com.citel.monitoramento.repository.portal.LogbkpRepository;
 
+/**
+ * Classe de monitoramento responsável por fazer o monitoramento do backup
+ * 
+ * @author lucas
+ * 
+ */
 @Log
 public class BackupMonitor {
 	@Setter
@@ -29,7 +35,7 @@ public class BackupMonitor {
 		if ("1".equals(monitoraBackup)) {
 			processLogBackup();
 			log.info("MONITORAMENTO BACKUP FEITO.");
-		}else{
+		} else {
 			log.info("MONITORAMENTO BACKUP DESLIGADO.");
 		}
 	}

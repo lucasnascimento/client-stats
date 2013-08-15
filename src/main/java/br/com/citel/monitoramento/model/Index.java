@@ -4,9 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * DTO Classe utilitária.
+ * 
+ * @author lucas
+ * 
+ */
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"indexName"})
-public @Data class Index {
+@EqualsAndHashCode(of = { "indexName" })
+public @Data
+class Index {
 	private String indexName;
 	private String columnName;
 }

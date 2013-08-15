@@ -16,6 +16,12 @@ import br.com.citel.monitoramento.repository.portal.LoghdRepository;
 import lombok.Setter;
 import lombok.extern.java.Log;
 
+/**
+ * Classe de monitoramento responsável por fazer o monitoramento do HD
+ * 
+ * @author lucas
+ * 
+ */
 @Log
 public class HDMonitor {
 	@Setter

@@ -14,6 +14,12 @@ import br.com.citel.monitoramento.repository.autcom.ContmoAutComRepository;
 import br.com.citel.monitoramento.repository.portal.ContloPortalRepository;
 import br.com.citel.monitoramento.repository.portal.ContmoPortalRepository;
 
+/**
+ * Classe de responsável por fazer a sincronia do CONTMO e CONLO
+ * 
+ * @author lucas
+ * 
+ */
 @Log
 public class DatabaseSync {
 
@@ -51,7 +57,7 @@ public class DatabaseSync {
 
 	private void processaCONTMO() {
 		List<CONTMO> contmoList = contmoPortalRepository.findByEmpresaFiscaAndCNPJ(empresaFisica, cnpjEmpresa);
-		contmoPortalRepository.deleteInBatch(contmoList);	
+		contmoPortalRepository.deleteInBatch(contmoList);
 		contmoPortalRepository.save(contmoAutComRepository.findAll());
 	}
 
