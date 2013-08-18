@@ -81,6 +81,15 @@ public class DatabaseMonitor {
 				dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), "TABELA NÃO ENCONTRADA NO DATABASE DESTINO"));
 			} else {
 				Table tableTarget = tableTargetList.remove(tableTargetIndex);
+				
+				if (tableTarget.getEngine().equalsIgnoreCase(tableSource.getEngine())){
+					dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), String.format("COLLATION DIFERENTE NO DESTINO NO MODELO %S NO DESTINO %s ", tableSource.getEngine(), tableTarget.getEngine())));
+				}
+				
+				if (tableTarget.getCollation().equalsIgnoreCase(tableSource.getCollation())){
+					dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), String.format("COLLATION DIFERENTE NO DESTINO NO MODELO %S NO DESTINO %s ", tableSource.getEngine(), tableTarget.getEngine())));
+				}
+				
 				compareField(tableSource.getTableName(), tableSource.getFields(), tableTarget.getFields());
 				compareIndex(tableSource.getTableName(), tableSource.getIndexes(), tableTarget.getIndexes());
 			}
@@ -135,11 +144,13 @@ public class DatabaseMonitor {
 	}
 
 	private List<Table> loadTables(final JdbcTemplate jdbcTemplate) {
-		return jdbcTemplate.query("show tables", new RowMapper<Table>() {
+		return jdbcTemplate.query("SHOW TABLE STATUS FROM AUTCOM", new RowMapper<Table>() {
 			@Override
 			public Table mapRow(ResultSet rs, int rownumber) throws SQLException {
-				String tableName = rs.getString(1);
-				return new Table(tableName, loadFields(jdbcTemplate, tableName), loadIndexes(jdbcTemplate, tableName));
+				String tableName = rs.getString("Name");
+				String engine = StringUtils.upperCase(rs.getString("Engine"));
+				String collation = StringUtils.upperCase(rs.getString("Collation"));
+				return new Table(tableName, engine, collation, loadFields(jdbcTemplate, tableName), loadIndexes(jdbcTemplate, tableName));
 			}
 		});
 	}
