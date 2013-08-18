@@ -16,4 +16,5 @@ public @Data
 class Index {
 	private String indexName;
 	private String columnName;
+	private Boolean nonUnique;
 }

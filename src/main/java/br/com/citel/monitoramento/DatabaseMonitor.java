@@ -150,7 +150,7 @@ public class DatabaseMonitor {
 			public Field mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String fieldName = StringUtils.upperCase(rs.getString("field"));
 				String type = StringUtils.upperCase(rs.getString("type"));
-				Boolean nullable = rs.getString("null").equalsIgnoreCase("YES") ? true : false;
+				Boolean nullable =  "YES".equalsIgnoreCase( rs.getString("null") ) ? true : false;
 				String key = StringUtils.upperCase(rs.getString("key"));
 				String def = StringUtils.upperCase(rs.getString("default"));
 				String extra = StringUtils.upperCase(rs.getString("extra"));
@@ -160,14 +160,19 @@ public class DatabaseMonitor {
 	}
 
 	private List<Index> loadIndexes(final JdbcTemplate jdbcTemplate, final String tableName) {
-		return jdbcTemplate.query("show index from  " + tableName, new RowMapper<Index>() {
+		List<Index> indexesList = jdbcTemplate.query("show index from  " + tableName, new RowMapper<Index>() {
 			@Override
 			public Index mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String indexName = StringUtils.upperCase(rs.getString("Key_name"));
 				String columnName = StringUtils.upperCase(rs.getString("Column_name"));
-				return new Index(indexName, columnName);
+				Boolean nonUnique = "0".equals( rs.getString("Non_unique") ) ? true : false ; 
+				return new Index(indexName, columnName, nonUnique);
 			}
 		});
+		
+		//TODO: Terminar implementação da refatoração do modo de comparar os indices
+		
+		return indexesList;
 	}
 
 }
