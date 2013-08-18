@@ -1,7 +1,5 @@
 package br.com.citel.monitoramento.model;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,11 +11,8 @@ import lombok.EqualsAndHashCode;
  * 
  */
 @AllArgsConstructor
-@EqualsAndHashCode(of = { "tableName" })
+@EqualsAndHashCode(of = { "foreingKeyDescription" })
 public @Data
-class Table {
-	private String tableName;
-	private List<Field> fields;
-	private List<Index> indexes;
-	private List<ForeignKey> foreignKeys;
+class ForeignKey {
+	private String foreingKeyDescription;
 }
