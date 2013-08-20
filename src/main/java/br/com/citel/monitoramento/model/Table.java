@@ -21,4 +21,5 @@ class Table {
 	private String collation;
 	private List<Field> fields;
 	private List<Index> indexes;
+	private List<ForeignKey> foreignKeys;
 }
