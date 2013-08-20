@@ -3,7 +3,9 @@ package br.com.citel.monitoramento;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Setter;
 import lombok.extern.java.Log;
@@ -117,21 +119,49 @@ public class DatabaseMonitor {
 	}
 
 	private void compareIndex(String tableName, List<Index> indexSourceList, List<Index> indexTargetList) {
+		
+		List<Index> indexChecked = new ArrayList<Index>();
+		
 		for (Index indexSource : indexSourceList) {
-			int indexTargetIndex = indexTargetList.indexOf(indexSource);
-			if (indexTargetIndex < 0) {
-				dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NÃO ENCONTRADO NO DESTINO: %s", indexSource.getIndexName())));
-			} else {
-				Index indexTarget = indexTargetList.remove(indexTargetIndex);
-				if (!StringUtils.equals(indexTarget.getColumnName(), indexSource.getColumnName())) {
-					dbTicketList.add(new DatabaseTicket(tableName, String.format("INCONSISTÊNCIA DE COLUNAS NO INDÍCE: MODELO: %s %s DESTINO: %s %s ", indexSource.getIndexName(),
-							indexSource.getColumnName(), indexTarget.getIndexName(), indexTarget.getColumnName())));
+			
+			if ( indexSource.getUnique() ){
+				int indexTargetIndex = indexTargetList.indexOf(indexSource);
+				if (indexTargetIndex > -1){
+					Index indexTarget = indexTargetList.get(indexTargetIndex);
+					if (indexSource.getUnique() != indexTarget.getUnique()){
+						dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NO DESTINO DEVERIA SER UNIQUE: %s (%s)", indexTarget.getIndexName(), indexTarget.getColumnName())));
+					}
+				}else{
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE UNIQUE NÃO ENCONTRADO NO DESTINO: %s (%s)", indexSource.getIndexName(), indexSource.getColumnName())));
 				}
+				indexChecked.add(indexSource);
+			}else{
+				
+				int indexTargetIndex = indexTargetList.indexOf(indexSource);
+				
+				if (indexTargetIndex > -1){
+					indexChecked.add(indexSource);
+				}
+				
+				
+				for (Index i : indexTargetList){
+					
+					if (StringUtils.contains(i.getColumnName(),indexSource.getColumnName())){
+						indexChecked.add(indexSource);
+					}
+					
+				}
+				
 			}
+			
 		}
-		for (Index indexTarget : indexTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableName, String.format("INDÍCE NÃO ENCONTRADO NO MODELO: %s", indexTarget.getIndexName())));
+		
+		indexSourceList.removeAll(indexChecked);
+		
+		for (Index indexMissing: indexSourceList){
+			dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NÃO ENCONTRADO NO DESTINO: %s (%s)", indexMissing.getIndexName(), indexMissing.getColumnName())));
 		}
+			
 	}
 
 	private List<Table> loadTables(final JdbcTemplate jdbcTemplate) {
@@ -165,14 +195,39 @@ public class DatabaseMonitor {
 			public Index mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String indexName = StringUtils.upperCase(rs.getString("Key_name"));
 				String columnName = StringUtils.upperCase(rs.getString("Column_name"));
-				Boolean nonUnique = "0".equals( rs.getString("Non_unique") ) ? true : false ; 
-				return new Index(indexName, columnName, nonUnique);
+				Boolean unique = "0".equals( rs.getString("Non_unique") ) ? true : false ; 
+				return new Index(indexName, columnName, unique);
 			}
 		});
 		
-		//TODO: Terminar implementação da refatoração do modo de comparar os indices
+		Map<String,List<Index>> map = new HashMap<String, List<Index>>(); 
 		
-		return indexesList;
+		for (Index index : indexesList){
+			if (!map.containsKey(index.getIndexName())){
+				List<Index> indexList = new ArrayList<Index>();
+				indexList.add(index);
+				map.put(index.getIndexName(), indexList);
+			}else{
+				map.get(index.getIndexName()).add(index);
+			}
+		}
+		
+		List<Index> indexFinalList = new ArrayList<Index>();
+		for ( List<Index> indexList : map.values() ){
+			Index i = indexList.get(0);
+			String indexString = ""; 
+			for (Index index : indexList){
+				if (StringUtils.isEmpty(indexString)){
+					indexString = index.getColumnName();
+				}else{
+					indexString = indexString + "," +  index.getColumnName();
+				}
+			}
+			i.setColumnName(indexString);
+			indexFinalList.add(i);
+		}
+		
+		return indexFinalList;
 	}
 
 }

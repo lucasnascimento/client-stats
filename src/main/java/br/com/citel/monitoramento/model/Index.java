@@ -11,10 +11,10 @@ import lombok.EqualsAndHashCode;
  * 
  */
 @AllArgsConstructor
-@EqualsAndHashCode(of = { "indexName" })
+@EqualsAndHashCode(of = { "columnName" })
 public @Data
 class Index {
 	private String indexName;
 	private String columnName;
-	private Boolean nonUnique;
+	private Boolean unique;
 }
