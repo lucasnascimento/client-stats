@@ -20,4 +20,5 @@ class Field {
 	private String key;
 	private String def;
 	private String extra;
+	private Boolean temCharcterSet;
 }

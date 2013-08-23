@@ -85,15 +85,17 @@ public class DatabaseMonitor {
 				dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), "TABELA NÃO ENCONTRADA NO DATABASE DESTINO"));
 			} else {
 				Table tableTarget = tableTargetList.remove(tableTargetIndex);
-				
-				if (tableTarget.getEngine().equalsIgnoreCase(tableSource.getEngine())){
-					dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), String.format("COLLATION DIFERENTE NO DESTINO NO MODELO %S NO DESTINO %s ", tableSource.getEngine(), tableTarget.getEngine())));
+
+				if (!tableTarget.getEngine().equalsIgnoreCase(tableSource.getEngine())) {
+					dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), String.format("ENGINE DIFERENTE NO DESTINO NO MODELO %S NO DESTINO %s ", tableSource.getEngine(),
+							tableTarget.getEngine())));
 				}
-				
-				if (tableTarget.getCollation().equalsIgnoreCase(tableSource.getCollation())){
-					dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), String.format("COLLATION DIFERENTE NO DESTINO NO MODELO %S NO DESTINO %s ", tableSource.getEngine(), tableTarget.getEngine())));
+
+				if (!tableTarget.getCollation().equalsIgnoreCase(tableSource.getCollation())) {
+					dbTicketList.add(new DatabaseTicket(tableSource.getTableName(), String.format("COLLATION DIFERENTE NO DESTINO NO MODELO %S NO DESTINO %s ", tableSource.getCollation(),
+							tableTarget.getCollation())));
 				}
-				
+
 				compareField(tableSource.getTableName(), tableSource.getFields(), tableTarget.getFields());
 				compareIndex(tableSource.getTableName(), tableSource.getIndexes(), tableTarget.getIndexes());
 				compareForeignKeys(tableSource.getTableName(), tableSource.getForeignKeys(), tableTarget.getForeignKeys());
@@ -123,65 +125,74 @@ public class DatabaseMonitor {
 					dbTicketList.add(new DatabaseTicket(tableName, String.format("NULL INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getNullable(),
 							fieldTarget.getFieldName(), fieldTarget.getNullable())));
 				}
+				if (fieldTarget.getTemCharcterSet()) {
+					dbTicketList.add(new DatabaseTicket(tableName, String.format("CAMPO DO DESTINO TEM CHARACTER SET OU COLLATE: %s ", fieldTarget.getFieldName())));
+				}
 			}
 		}
 		for (Field fieldTarget : fieldTargetList) {
+			if (fieldTarget.getTemCharcterSet()) {
+				dbTicketList.add(new DatabaseTicket(tableName, String.format("CAMPO DO DESTINO TEM CHARACTER SET OU COLLATE: %s ", fieldTarget.getFieldName())));
+			}
 			dbTicketList.add(new DatabaseTicket(tableName, String.format("CAMPO NÃO ENCONTRADO NO MODELO: %s", fieldTarget.getFieldName())));
 		}
 	}
 
 	private void compareIndex(String tableName, List<Index> indexSourceList, List<Index> indexTargetList) {
-		
+
 		List<Index> indexChecked = new ArrayList<Index>();
-		
+
 		for (Index indexSource : indexSourceList) {
-			
-			if ( indexSource.getUnique() ){
-				int indexTargetIndex = indexTargetList.indexOf(indexSource);
-				if (indexTargetIndex > -1){
-					Index indexTarget = indexTargetList.get(indexTargetIndex);
-					if (indexSource.getUnique() != indexTarget.getUnique()){
-						dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NO DESTINO DEVERIA SER UNIQUE: %s (%s)", indexTarget.getIndexName(), indexTarget.getColumnName())));
+
+			if (indexSource.getUnique()) {
+
+				List<Index> matchedOnTarget = new ArrayList<Index>();
+				boolean someUnique = false;
+				do {
+					int indexTargetIndex = indexTargetList.indexOf(indexSource);
+					if (indexTargetIndex > -1) {
+						Index match = indexTargetList.remove(indexTargetIndex);
+						if (match.getUnique())
+							someUnique = true;
+						matchedOnTarget.add(match);
 					}
-				}else{
+				} while (indexTargetList.indexOf(indexSource) > -1);
+
+				if (!matchedOnTarget.isEmpty()) {
+					if (!someUnique) {
+						dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NO DESTINO DEVERIA SER UNIQUE: (%s)", indexSource.getColumnName())));
+					}
+				} else {
 					dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE UNIQUE NÃO ENCONTRADO NO DESTINO: %s (%s)", indexSource.getIndexName(), indexSource.getColumnName())));
 				}
+				indexTargetList.addAll(matchedOnTarget);
 				indexChecked.add(indexSource);
-			}else{
-				
-				int indexTargetIndex = indexTargetList.indexOf(indexSource);
-				
-				if (indexTargetIndex > -1){
-					indexChecked.add(indexSource);
-				}
-				
-				
-				for (Index i : indexTargetList){
-					
-					if (StringUtils.contains(i.getColumnName(),indexSource.getColumnName())){
+			} else {
+
+				for (Index i : indexTargetList) {
+					if (StringUtils.contains(i.getColumnName(), indexSource.getColumnName())) {
 						indexChecked.add(indexSource);
+						break;
 					}
-					
 				}
-				
 			}
-			
+
 		}
-		
+
 		indexSourceList.removeAll(indexChecked);
-		
-		for (Index indexMissing: indexSourceList){
+
+		for (Index indexMissing : indexSourceList) {
 			dbTicketList.add(new DatabaseTicket(tableName, String.format("INDICE NÃO ENCONTRADO NO DESTINO: %s (%s)", indexMissing.getIndexName(), indexMissing.getColumnName())));
 		}
-			
+
 	}
-	
+
 	private void compareForeignKeys(String tableName, List<ForeignKey> foreignSourceList, List<ForeignKey> foreignTargetList) {
 		for (ForeignKey foreignSource : foreignSourceList) {
 			int foreignTargetIndex = foreignTargetList.indexOf(foreignSource);
 			if (foreignTargetIndex < 0) {
 				dbTicketList.add(new DatabaseTicket(tableName, String.format("FOREIGN KEY NÃO ENCONTRADO NO DESTINO: %s", foreignSource.getForeingKeyDescription())));
-			} 
+			}
 		}
 	}
 
@@ -189,27 +200,51 @@ public class DatabaseMonitor {
 		return jdbcTemplate.query("SHOW TABLE STATUS FROM AUTCOM", new RowMapper<Table>() {
 			@Override
 			public Table mapRow(ResultSet rs, int rownumber) throws SQLException {
-				String tableName = rs.getString("Name");
+				String tableNameAsIs = rs.getString("Name");
+				String tableName = StringUtils.upperCase(tableNameAsIs);
 				String engine = StringUtils.upperCase(rs.getString("Engine"));
 				String collation = StringUtils.upperCase(rs.getString("Collation"));
-				return new Table(tableName, engine, collation, loadFields(jdbcTemplate, tableName), loadIndexes(jdbcTemplate, tableName), loadForeignKey(jdbcTemplate, tableName));
+
+				String createTable = loadCreateTable(jdbcTemplate, tableNameAsIs);
+				List<Field> fields = loadFields(jdbcTemplate, tableNameAsIs, createTable);
+				List<Index> indexes = loadIndexes(jdbcTemplate, tableNameAsIs);
+				List<ForeignKey> foreignKeys = loadForeignKey(createTable);
+
+				return new Table(tableName, tableNameAsIs, engine, collation, fields, indexes, foreignKeys, createTable);
 			}
 		});
 	}
 
-	private List<Field> loadFields(final JdbcTemplate jdbcTemplate, final String tableName) {
-		return jdbcTemplate.query("show columns from " + tableName, new RowMapper<Field>() {
+	private List<Field> loadFields(final JdbcTemplate jdbcTemplate, final String tableName, String createTable) {
+		List<Field> fieldList = jdbcTemplate.query("show columns from " + tableName, new RowMapper<Field>() {
 			@Override
 			public Field mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String fieldName = StringUtils.upperCase(rs.getString("field"));
 				String type = StringUtils.upperCase(rs.getString("type"));
-				Boolean nullable =  "YES".equalsIgnoreCase( rs.getString("null") ) ? true : false;
+				Boolean nullable = "YES".equalsIgnoreCase(rs.getString("null")) ? true : false;
 				String key = StringUtils.upperCase(rs.getString("key"));
 				String def = StringUtils.upperCase(rs.getString("default"));
 				String extra = StringUtils.upperCase(rs.getString("extra"));
-				return new Field(fieldName, type, nullable, key, def, extra);
+				return new Field(fieldName, type, nullable, key, def, extra, false);
 			}
 		});
+
+		for (Field field : fieldList) {
+			field.setTemCharcterSet(procuraCharacterSet(field.getFieldName(), createTable));
+		}
+
+		return fieldList;
+	}
+
+	private Boolean procuraCharacterSet(String fieldName, String createTable) {
+
+		for (String line : Arrays.asList(createTable.toUpperCase().split("\n"))) {
+			int indexOfFIELD = line.indexOf(fieldName);
+			if ((indexOfFIELD > -1) && (line.contains("CHARACTER") || line.contains("COLLATE"))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private List<Index> loadIndexes(final JdbcTemplate jdbcTemplate, final String tableName) {
@@ -218,60 +253,51 @@ public class DatabaseMonitor {
 			public Index mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String indexName = StringUtils.upperCase(rs.getString("Key_name"));
 				String columnName = StringUtils.upperCase(rs.getString("Column_name"));
-				Boolean unique = "0".equals( rs.getString("Non_unique") ) ? true : false ; 
+				Boolean unique = "0".equals(rs.getString("Non_unique")) ? true : false;
+
+				if (!unique) {
+					indexName = indexName + columnName;
+				}
+
 				return new Index(indexName, columnName, unique);
 			}
 		});
-		
-		Map<String,List<Index>> map = new HashMap<String, List<Index>>(); 
-		
-		for (Index index : indexesList){
-			if (!map.containsKey(index.getIndexName())){
+
+		Map<String, List<Index>> map = new HashMap<String, List<Index>>();
+
+		for (Index index : indexesList) {
+
+			if (!map.containsKey(index.getIndexName())) {
 				List<Index> indexList = new ArrayList<Index>();
 				indexList.add(index);
 				map.put(index.getIndexName(), indexList);
-			}else{
+			} else {
 				map.get(index.getIndexName()).add(index);
 			}
+
 		}
-		
+
 		List<Index> indexFinalList = new ArrayList<Index>();
-		for ( List<Index> indexList : map.values() ){
+		for (List<Index> indexList : map.values()) {
 			Index i = indexList.get(0);
-			String indexString = ""; 
-			for (Index index : indexList){
-				if (StringUtils.isEmpty(indexString)){
+			String indexString = "";
+			for (Index index : indexList) {
+				if (StringUtils.isEmpty(indexString)) {
 					indexString = index.getColumnName();
-				}else{
-					indexString = indexString + "," +  index.getColumnName();
+				} else {
+					indexString = indexString + "," + index.getColumnName();
 				}
 			}
 			i.setColumnName(indexString);
 			indexFinalList.add(i);
 		}
-		
+
 		return indexFinalList;
 	}
 
-	private List<ForeignKey> loadForeignKey(final JdbcTemplate jdbcTemplate, final String tableName) {
-
-		List<String> listCreateTable = jdbcTemplate.query("show create table  " + tableName, new RowMapper<String>() {
-			@Override
-			public String mapRow(ResultSet rs, int rownumber) throws SQLException {
-				String fullCreateTable = rs.getString(2);
-				return fullCreateTable;
-			}
-		});
-
-		String descriptionCreateTable = listCreateTable.get(1);
-
-		return loadForeignKeyFromDescription(descriptionCreateTable);
-	}
-
-	private List<ForeignKey> loadForeignKeyFromDescription(String descriptionCreateTable) {
-
+	private List<ForeignKey> loadForeignKey(final String createTable) {
 		List<ForeignKey> resultList = new ArrayList<ForeignKey>();
-		for (String line : Arrays.asList(descriptionCreateTable.split("/n"))) {
+		for (String line : Arrays.asList(createTable.split("\n"))) {
 
 			int indexofFOREIG = line.indexOf("FOREIGN KEY");
 			int length = line.length();
@@ -290,142 +316,16 @@ public class DatabaseMonitor {
 		return resultList;
 	}
 
-	// CREATE TABLE `CADREC` (
-	// `CTR_NUMDUP` varchar(6) NOT NULL default '',
-	// `CTR_PARCEL` char(1) NOT NULL default '',
-	// `CTR_SEQBAI` int(11) NOT NULL default '0',
-	// `CTR_ESPDOC` char(2) NOT NULL default '',
-	// `CTR_CODCLI` varchar(8) NOT NULL default '',
-	// `CTR_CODEMP` char(3) NOT NULL default '',
-	// `CTR_CODVEN` char(3) default NULL,
-	// `CTR_CODDIG` char(3) default NULL,
-	// `CTR_CODPOR` varchar(5) default NULL,
-	// `CTR_DTACAD` date NOT NULL default '0000-00-00',
-	// `CTR_DTAVEN` date NOT NULL default '0000-00-00',
-	// `CTR_VALDUP` decimal(12,2) default NULL,
-	// `CTR_VALORI` decimal(12,2) default NULL,
-	// `CTR_DESCOB` decimal(12,2) default NULL,
-	// `CTR_DESCON` char(1) default 'N',
-	// `CTR_HIST01` text,
-	// `CTR_HIST02` varchar(50) default NULL,
-	// `CTR_PORBAI` varchar(5) default NULL,
-	// `CTR_HISBAI` varchar(50) default NULL,
-	// `CTR_CTABAI` varchar(7) default NULL,
-	// `CTR_DOCBAI` varchar(13) default NULL,
-	// `CTR_OPEBAI` char(3) default NULL,
-	// `CTR_DTAREC` date default NULL,
-	// `CTR_VALREC` decimal(12,2) default NULL,
-	// `CTR_VALJUR` decimal(12,2) default NULL,
-	// `CTR_VALDES` decimal(12,2) default NULL,
-	// `CTR_RESCAI` tinyint(1) default NULL,
-	// `CTR_NOSNUM` varchar(12) default NULL,
-	// `CTR_DTABOL` date default NULL,
-	// `CTR_BCOBOL` char(3) default NULL,
-	// `CTR_BCOENV` char(3) default NULL,
-	// `CTR_DTAENV` date default NULL,
-	// `AUTOINCREM` varchar(20) NOT NULL default '',
-	// `CTR_OBSAG1` varchar(80) default NULL,
-	// `CTR_OBSAG2` varchar(80) default NULL,
-	// `CTR_OBSAG3` varchar(80) default NULL,
-	// `CTR_DTABAI` date default NULL,
-	// `CTR_CODEVE` varchar(5) default NULL,
-	// `CTR_CODVEL` varchar(20) default NULL,
-	// `CTR_DINHEI` decimal(12,2) default '0.00',
-	// `CTR_CHQAVI` decimal(12,2) default '0.00',
-	// `CTR_CHQPRE` decimal(12,2) default '0.00',
-	// `CTR_CARTAO` decimal(12,2) default '0.00',
-	// `CTR_SEQMOD` int(11) default NULL,
-	// `CTR_TIPFOR` varchar(10) default NULL,
-	// `CTR_CODCND` char(3) default NULL,
-	// `CTR_CONAPR` tinyint(1) default NULL,
-	// `CTR_RECDIN` char(1) default 'N',
-	// `CTR_RECCHE` char(1) default 'N',
-	// `CTR_RECPRE` char(1) default 'N',
-	// `CTR_RECCAR` char(1) default 'N',
-	// `CTR_CODCTA` varchar(7) default NULL,
-	// `CTR_CTASER` varchar(7) default NULL,
-	// `CTR_SERVAL` decimal(12,2) default NULL,
-	// `CTR_ORDPAG` decimal(12,2) default '0.00',
-	// `CTR_RECORD` char(1) default 'N',
-	// `CTR_VALCOM` decimal(12,2) default NULL,
-	// `CTR_FATCOM` decimal(12,8) default NULL,
-	// `CTR_SEQCOM` varchar(20) default NULL,
-	// `CTR_DESVEN` decimal(5,2) default '0.00',
-	// `CTR_EMPBAI` char(3) default NULL,
-	// `CTR_DTASER` date default NULL,
-	// `CTR_VALIPI` decimal(12,2) default '0.00',
-	// `CTR_VALRET` decimal(12,2) default '0.00',
-	// `CTR_DOCDIV` varchar(6) default NULL,
-	// `CTR_ESPDIV` char(2) default NULL,
-	// `CTR_EMPDIV` char(3) default NULL,
-	// `CTR_CLIDIV` varchar(8) default NULL,
-	// `CTR_JURSUJ` decimal(12,2) default '0.00',
-	// `CTR_JURANT` decimal(12,2) default '0.00',
-	// `CTR_DESSUJ` decimal(12,2) default '0.00',
-	// `CTR_DESANT` decimal(12,2) default '0.00',
-	// `CTR_SEQCON` int(11) default '0',
-	// `CTR_QTDDAV` int(3) default '0',
-	// `CTR_PERDPO` decimal(12,2) default '0.00',
-	// `CTR_CODREP` char(3) default NULL,
-	// `CTR_COMREP` decimal(5,2) default NULL,
-	// `CTR_FATREP` decimal(12,8) default NULL,
-	// `CTR_VALANT` decimal(12,2) default NULL,
-	// `CTR_ORIF11` char(1) default 'N',
-	// `CTR_VALFIN` decimal(12,2) default NULL,
-	// `CTR_RECFIN` char(1) default NULL,
-	// `CTR_EMP_PD` char(3) default NULL,
-	// `CTR_NOMFRM` varchar(70) default NULL,
-	// `CTR_VRTRDV` decimal(12,2) default NULL,
-	// `CTR_BARCON` varchar(13) default NULL,
-	// `CTR_COMDIV` decimal(12,2) default NULL,
-	// `CTR_FATDIV` decimal(12,2) default NULL,
-	// `CTR_CODDIV` varchar(8) default NULL,
-	// `CTR_PROTES` varchar(12) default NULL,
-	// `CTR_CTREME` varchar(10) default NULL,
-	// `CTR_DTAPFI` date default NULL,
-	// `CTR_MOTBAI` char(2) default NULL,
-	// `CTR_VALFRE` decimal(12,2) default '0.00',
-	// `CTR_CTPCOM` varchar(9) default NULL,
-	// `CTR_VALACE` decimal(12,2) default '0.00',
-	// PRIMARY KEY (`AUTOINCREM`),
-	// UNIQUE KEY `UK_CADREC_01`
-	// (`CTR_NUMDUP`,`CTR_PARCEL`,`CTR_SEQBAI`,`CTR_ESPDOC`,`CTR_CODCLI`,`CTR_CODEMP`),
-	// KEY `IDX_CADREC_01` (`CTR_CODPOR`),
-	// KEY `IDX_CADREC_02` (`CTR_CODVEN`),
-	// KEY `IDX_CADREC_03` (`CTR_CODEVE`),
-	// KEY `IDX_CADREC_04` (`CTR_DTACAD`),
-	// KEY `IDX_CADREC_05` (`CTR_CODCTA`),
-	// KEY `IDX_CADREC_06` (`CTR_CODCLI`,`CTR_DTAREC`),
-	// KEY `IDX_CADREC_07` (`CTR_DTAREC`),
-	// KEY `IDX_CADREC_08` (`CTR_CODCLI`,`CTR_DTAVEN`),
-	// KEY `IDX_CADREC_09` (`CTR_CODCLI`,`CTR_DTACAD`),
-	// KEY `IDX_CADREC_10` (`CTR_DTAVEN`),
-	// KEY `IDX_CADREC_11` (`AUTOINCREM`),
-	// KEY `IDX_CADREC_12`
-	// (`CTR_ESPDOC`,`CTR_DOCDIV`,`CTR_ESPDIV`,`CTR_CLIDIV`,`CTR_EMPDIV`),
-	// KEY `IDX_CADREC_13` (`CTR_SEQCON`,`CTR_EMPBAI`),
-	// KEY `IDX_CADREC_14`
-	// (`CTR_NUMDUP`,`CTR_ESPDOC`,`CTR_CODEMP`,`CTR_CODCLI`),
-	// KEY `IDX_CADREC_15` (`CTR_NOSNUM`),
-	// KEY `IDX_CADREC_16` (`CTR_CODDIG`),
-	// KEY `IDX_CADREC_17` (`CTR_EMPBAI`),
-	// KEY `IDX_CADREC_18` (`CTR_CODREP`),
-	// KEY `IDX_CADREC_19` (`CTR_CODEMP`,`CTR_CTPCOM`),
-	// CONSTRAINT `FK_CADREC_01` FOREIGN KEY (`CTR_CODDIG`) REFERENCES `CADOPE`
-	// (`OPE_CODOPE`),
-	// CONSTRAINT `FK_CADREC_02` FOREIGN KEY (`CTR_EMPBAI`) REFERENCES `CADEMP`
-	// (`EMP_CODEMP`),
-	// CONSTRAINT `FK_CADREC_03` FOREIGN KEY (`CTR_CODREP`) REFERENCES `CADOPE`
-	// (`OPE_CODOPE`),
-	// CONSTRAINT `FK_CADREC_04` FOREIGN KEY (`CTR_CODEVE`) REFERENCES `CADEVE`
-	// (`EVE_CODEVE`),
-	// CONSTRAINT `FK_CADREC_05` FOREIGN KEY (`CTR_CODPOR`) REFERENCES `CADPOR`
-	// (`POR_CODPOR`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-	// CONSTRAINT `FK_CADREC_06` FOREIGN KEY (`CTR_CODCLI`) REFERENCES `CADCLI`
-	// (`CLI_CODCLI`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-	// CONSTRAINT `FK_CADREC_07` FOREIGN KEY (`CTR_CODVEN`) REFERENCES `CADOPE`
-	// (`OPE_CODOPE`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-	// CONSTRAINT `FK_CADREC_08` FOREIGN KEY (`CTR_CODCTA`) REFERENCES `CADCTA`
-	// (`CTA_CODCTA`)
-	// ) ENGINE=InnoDB DEFAULT CHARSET=latin1
+	private String loadCreateTable(final JdbcTemplate jdbcTemplate, final String tableName) {
+		List<String> listCreateTable = jdbcTemplate.query("show create table  " + tableName, new RowMapper<String>() {
+			@Override
+			public String mapRow(ResultSet rs, int rownumber) throws SQLException {
+				String fullCreateTable = rs.getString(2);
+				return fullCreateTable;
+			}
+		});
+
+		return listCreateTable.get(0);
+	}
+
 }

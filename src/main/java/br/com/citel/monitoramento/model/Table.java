@@ -17,9 +17,11 @@ import lombok.EqualsAndHashCode;
 public @Data
 class Table {
 	private String tableName;
+	private String tableNameAsIs;
 	private String engine;
 	private String collation;
 	private List<Field> fields;
 	private List<Index> indexes;
 	private List<ForeignKey> foreignKeys;
+	private String createTable;
 }
