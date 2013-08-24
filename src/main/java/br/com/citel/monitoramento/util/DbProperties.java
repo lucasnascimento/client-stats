@@ -44,7 +44,6 @@ public class DbProperties extends Properties {
 				valor = valor.replace(".", "_");
 			}
 
-			
 			log.debug(String.format("Loading from DB: [{%s}:{%s}]", chave, valor));
 			setProperty(chave, valor);
 		}
@@ -52,10 +51,9 @@ public class DbProperties extends Properties {
 		if (!containsKey("AUTCOM_VERSAO")) {
 			setProperty("AUTCOM_VERSAO", "AUTCOM");
 		}
-		
+
 		setProperty("empFisic", empresaFisica);
-		
-		
+
 		log.info("PROPRIEDADES CARREGADAS: " + this.toString());
 
 	}
