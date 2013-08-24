@@ -9,7 +9,7 @@
 		<class>br.com.citel.monitoramento.entity.CONTLO</class>
 		<class>br.com.citel.monitoramento.entity.CONTMO</class>
 		<properties>
-			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="false" />
 			<property name="hibernate.use_sql_comments" value="true" />
 		</properties>
@@ -23,7 +23,7 @@
 		<class>br.com.citel.monitoramento.entity.CONTLO</class>
 		<class>br.com.citel.monitoramento.entity.CONTMO</class>
 		<properties>
-			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.show_sql" value="false" />
 			<property name="hibernate.format_sql" value="false" />
 			<property name="hibernate.use_sql_comments" value="true" />
 		</properties>

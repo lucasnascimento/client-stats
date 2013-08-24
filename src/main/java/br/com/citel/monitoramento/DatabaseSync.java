@@ -3,7 +3,7 @@ package br.com.citel.monitoramento;
 import java.util.List;
 
 import lombok.Setter;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,7 +20,7 @@ import br.com.citel.monitoramento.repository.portal.ContmoPortalRepository;
  * @author lucas
  * 
  */
-@Log
+@Log4j
 public class DatabaseSync {
 
 	@Setter

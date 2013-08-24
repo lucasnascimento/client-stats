@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.Setter;
+import lombok.extern.log4j.Log4j;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.citel.monitoramento.entity.LOG_HD;
 import br.com.citel.monitoramento.repository.portal.LoghdRepository;
-
-import lombok.Setter;
-import lombok.extern.java.Log;
 
 /**
  * Classe de monitoramento responsável por fazer o monitoramento do HD
@@ -22,7 +22,7 @@ import lombok.extern.java.Log;
  * @author lucas
  * 
  */
-@Log
+@Log4j
 public class HDMonitor {
 	@Setter
 	private String monitoraHD;

@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
@@ -17,7 +17,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  * @author lucas
  * 
  */
-@Log
+@Log4j
 public class DbProperties extends Properties {
 	private static final long serialVersionUID = 1L;
 
@@ -44,13 +44,16 @@ public class DbProperties extends Properties {
 				valor = valor.replace(".", "_");
 			}
 
-			log.info(String.format("Loading from DB: [{%s}:{%s}]", chave, valor));
+			
+			log.debug(String.format("Loading from DB: [{%s}:{%s}]", chave, valor));
 			setProperty(chave, valor);
 		}
 
 		if (!containsKey("AUTCOM_VERSAO")) {
 			setProperty("AUTCOM_VERSAO", "AUTCOM");
 		}
+		
+		setProperty("empFisic", empresaFisica);
 
 	}
 }

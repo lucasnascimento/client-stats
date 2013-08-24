@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Setter;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import br.com.citel.monitoramento.repository.portal.LogdataRepository;
  * @author lucas
  * 
  */
-@Log
+@Log4j
 public class DatabaseMonitor {
 
 	@Setter

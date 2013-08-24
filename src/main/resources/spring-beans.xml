@@ -22,7 +22,7 @@
 		transaction-manager-ref="portalTM">
 	</jpa:repositories>
 
-	<bean
+	<bean id="propertiesFromMonitorINI"
 		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="order" value="1" />
 		<property name="locations">
@@ -37,7 +37,7 @@
 		<property name="order" value="2" />
 		<property name="placeholderPrefix" value="%{" />
 		<property name="placeholderSuffix" value="}" />
-		<property name="empresaFisica" value="001" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
 	</bean>
 
 	<bean id="autcomDS" class="com.mchange.v2.c3p0.ComboPooledDataSource"
@@ -89,8 +89,6 @@
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 
-
-
 	<bean id="portalTM" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="portalEntityManagerFactory" />
 	</bean>
@@ -124,13 +122,13 @@
 		<property name="acquireIncrement" value="3" />
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
-	
+
 	<bean id="sourceJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<constructor-arg type="javax.sql.DataSource" ref="sourceDS"/>
+		<constructor-arg type="javax.sql.DataSource" ref="sourceDS" />
 	</bean>
 
 	<bean id="targetJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<constructor-arg type="javax.sql.DataSource" ref="autcomDS"/>
+		<constructor-arg type="javax.sql.DataSource" ref="autcomDS" />
 	</bean>
 
 
@@ -155,7 +153,7 @@
 	<bean class="br.com.citel.monitoramento.DatabaseSync" init-method="run">
 		<property name="enviaDados" value="%{CFG_MONLNO}" />
 		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}"></property>
-		<property name="empresaFisica" value="001" />
+		<property name="empresaFisica" value="%{empFisic}" />
 	</bean>
 
 </beans>
