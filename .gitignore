@@ -6,3 +6,4 @@ target/
 .metadata/
 *.sublime-*
 config.properties
+log/
