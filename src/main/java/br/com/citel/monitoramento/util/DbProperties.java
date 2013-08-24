@@ -54,6 +54,9 @@ public class DbProperties extends Properties {
 		}
 		
 		setProperty("empFisic", empresaFisica);
+		
+		
+		log.info("PROPRIEDADES CARREGADAS: " + this.toString());
 
 	}
 }

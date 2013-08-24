@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import lombok.extern.log4j.Log4j;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -17,11 +19,13 @@ import org.springframework.core.env.MutablePropertySources;
  * @author lucas
  * 
  */
+@Log4j
 public class DbPropertySourcesPlaceholderConfigurer extends PropertySourcesPlaceholderConfigurer {
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 
+		log.info("CARREGANDO PROPRIEDADES DO BANCO DE DADOS LOCAL");
 		DataSource dataSource = beanFactory.getBean("autcomDS", DataSource.class);
 
 		PropertySourcesPlaceholderConfigurer propertiesFromMonitorINI = beanFactory.getBean("propertiesFromMonitorINI", org.springframework.context.support.PropertySourcesPlaceholderConfigurer.class);

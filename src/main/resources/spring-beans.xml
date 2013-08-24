@@ -49,9 +49,9 @@
 		<property name="maxStatements" value="500" />
 		<property name="maxIdleTime" value="1800" />
 		<property name="maxPoolSize" value="50" />
-		<property name="minPoolSize" value="5" />
-		<property name="initialPoolSize" value="5" />
-		<property name="acquireIncrement" value="3" />
+		<property name="minPoolSize" value="1" />
+		<property name="initialPoolSize" value="1" />
+		<property name="acquireIncrement" value="1" />
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 
@@ -83,9 +83,9 @@
 		<property name="maxStatements" value="500" />
 		<property name="maxIdleTime" value="1800" />
 		<property name="maxPoolSize" value="50" />
-		<property name="minPoolSize" value="5" />
-		<property name="initialPoolSize" value="5" />
-		<property name="acquireIncrement" value="3" />
+		<property name="minPoolSize" value="1" />
+		<property name="initialPoolSize" value="1" />
+		<property name="acquireIncrement" value="1" />
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 
@@ -117,9 +117,9 @@
 		<property name="maxStatements" value="500" />
 		<property name="maxIdleTime" value="1800" />
 		<property name="maxPoolSize" value="50" />
-		<property name="minPoolSize" value="5" />
-		<property name="initialPoolSize" value="5" />
-		<property name="acquireIncrement" value="3" />
+		<property name="minPoolSize" value="1" />
+		<property name="initialPoolSize" value="1" />
+		<property name="acquireIncrement" value="1" />
 		<property name="idleConnectionTestPeriod" value="3000" />
 	</bean>
 

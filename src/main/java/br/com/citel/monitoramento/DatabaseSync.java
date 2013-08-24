@@ -39,13 +39,17 @@ public class DatabaseSync {
 	private ContloPortalRepository contloPortalRepository;
 
 	public void run() {
-		if ("1".equals(enviaDados)) {
-			processaCONTLO();
-			log.info("CONTLO ENVIADO PARA O PORTAL");
-			processaCONTMO();
-			log.info("CONTMO ENVIADO PARA O PORTAL");
-		} else {
-			log.info("ENVIO DE DADOS DESLIGADO");
+		try {
+			if ("1".equals(enviaDados)) {
+				processaCONTLO();
+				log.info("CONTLO ENVIADO PARA O PORTAL");
+				processaCONTMO();
+				log.info("CONTMO ENVIADO PARA O PORTAL");
+			} else {
+				log.info("ENVIO DE DADOS DESLIGADO");
+			}
+		} catch (Throwable t) {
+			log.error("ERRO AO PROCESSAR", t);
 		}
 	}
 

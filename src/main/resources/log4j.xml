@@ -19,8 +19,8 @@
 
 	<category name="br.com.citel">
 		<priority value="INFO" />
-		<appender-ref ref="consoleAppender" />
 		<appender-ref ref="fileAppender" />
+		<appender-ref ref="consoleAppender" />
 	</category>
 
 	<root>

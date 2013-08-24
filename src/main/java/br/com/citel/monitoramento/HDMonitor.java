@@ -32,11 +32,15 @@ public class HDMonitor {
 	private LoghdRepository loghdRepository;
 
 	public void run() {
-		if ("1".equals(monitoraHD)) {
-			processHDMonitor();
-			log.info("MONITORAMENTO HD FEITO.");
-		} else {
-			log.info("MONITORAMENTO HD DESLIGADO.");
+		try {
+			if ("1".equals(monitoraHD)) {
+				processHDMonitor();
+				log.info("MONITORAMENTO HD FEITO.");
+			} else {
+				log.info("MONITORAMENTO HD DESLIGADO.");
+			}
+		} catch (Throwable t) {
+			log.error("ERRO AO PROCESSAR", t);
 		}
 	}
 

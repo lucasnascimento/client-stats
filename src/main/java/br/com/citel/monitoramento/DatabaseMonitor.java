@@ -52,11 +52,15 @@ public class DatabaseMonitor {
 	private static List<DatabaseTicket> dbTicketList = new ArrayList<DatabaseTicket>();
 
 	public void run() throws SQLException {
-		if ("1".equals(monitoraDatabase)) {
-			processDatabaseMonitor();
-			log.info("MONITORAMENTO DATABASE FEITO.");
-		} else {
-			log.info("MONITORAMENTO DATABASE DESLIGADO.");
+		try {
+			if ("1".equals(monitoraDatabase)) {
+				processDatabaseMonitor();
+				log.info("MONITORAMENTO DATABASE FEITO.");
+			} else {
+				log.info("MONITORAMENTO DATABASE DESLIGADO.");
+			}
+		} catch (Throwable t) {
+			log.error("ERRO AO PROCESSAR", t);
 		}
 	}
 

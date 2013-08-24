@@ -31,12 +31,16 @@ public class BackupMonitor {
 	@Autowired
 	private LogbkpRepository logbkpRepository;
 
-	public void run() {
-		if ("1".equals(monitoraBackup)) {
-			processLogBackup();
-			log.info("MONITORAMENTO BACKUP FEITO.");
-		} else {
-			log.info("MONITORAMENTO BACKUP DESLIGADO.");
+	public void run() {		
+		try{
+			if ("1".equals(monitoraBackup)) {
+				processLogBackup();
+				log.info("MONITORAMENTO BACKUP FEITO.");
+			} else {
+				log.info("MONITORAMENTO BACKUP DESLIGADO.");
+			}			
+		}catch(Throwable t){
+			log.error("ERRO AO PROCESSAR", t);
 		}
 	}
 

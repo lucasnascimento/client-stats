@@ -2,6 +2,8 @@ package br.com.citel.monitoramento;
 
 import java.sql.SQLException;
 
+import lombok.extern.log4j.Log4j;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,6 +15,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Monitorar Espaço em Disco Monitorar Estrutura de Banco de Dados Monitorar O
  * arquivos gerados por backup Sincronizar CONTMO e CONTLO
  */
+@Log4j
 public class Main {
 
 	/**
@@ -23,7 +26,11 @@ public class Main {
 	 * @throws SQLException
 	 */
 	public static void main(String[] args) throws SQLException {
-		@SuppressWarnings({ "resource", "unused" })
-		ApplicationContext appContext = new ClassPathXmlApplicationContext("spring-beans.xml");
+		try {
+			@SuppressWarnings({ "resource", "unused" })
+			ApplicationContext appContext = new ClassPathXmlApplicationContext("spring-beans.xml");
+		} catch (Throwable t) {
+			log.error("ERRO AO PROCESSAR", t);
+		}
 	}
 }
