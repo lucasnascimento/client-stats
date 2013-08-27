@@ -27,7 +27,7 @@
 		<property name="order" value="1" />
 		<property name="locations">
 			<list>
-				<value>classpath:Monitor.ini</value>
+				<value>file:/opt/monitor/monitoramento/Monitor.ini</value>
 			</list>
 		</property>
 	</bean>
@@ -43,7 +43,7 @@
 	<bean id="autcomDS" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl" value="jdbc:mysql://vmcitel:${portAutc}/${dataAutc}" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:${portAutc}/${dataAutc}" />
 		<property name="user" value="${userAutc}" />
 		<property name="password" value="${passAutc}" />
 		<property name="maxStatements" value="500" />
@@ -136,6 +136,8 @@
 		init-method="run">
 		<property name="monitoraDatabase" value="%{CFG_MONDTA}" />
 		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}"></property>
+		<property name="sourceName" value="%{AUTCOM_VERSAO}"></property>
+		<property name="targetName" value="${dataAutc}"></property>
 	</bean>
 
 	<bean class="br.com.citel.monitoramento.BackupMonitor"

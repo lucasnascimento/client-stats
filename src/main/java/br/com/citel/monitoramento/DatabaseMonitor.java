@@ -39,6 +39,12 @@ public class DatabaseMonitor {
 
 	@Setter
 	private String cnpjEmpresa;
+	
+	@Setter
+	private String sourceName;
+	
+	@Setter 
+	private String targetName;
 
 	@Autowired
 	private LogdataRepository logdataRepository;
@@ -66,10 +72,13 @@ public class DatabaseMonitor {
 
 	public void processDatabaseMonitor() throws SQLException {
 		dbTicketList.clear();
-		List<Table> tableSourceList = loadTables(sourceJdbcTemplate);
-		List<Table> tableTargetList = loadTables(targetJdbcTemplate);
+		log.info("Carregando estrutura de tabelas do Souce:" + sourceName);
+		List<Table> tableSourceList = loadTables(sourceJdbcTemplate, sourceName);
+		log.info("Carregando estrutura de tabelas do Target:" + targetName);
+		List<Table> tableTargetList = loadTables(targetJdbcTemplate, targetName);
+		log.info("Comparando Estruturas");
 		compareTable(tableSourceList, tableTargetList);
-
+		log.info("Estruturas comparadas");
 		List<LOG_DTA> logdataList = logdataRepository.findByCNPJ(cnpjEmpresa);
 		logdataRepository.deleteInBatch(logdataList);
 
@@ -200,8 +209,8 @@ public class DatabaseMonitor {
 		}
 	}
 
-	private List<Table> loadTables(final JdbcTemplate jdbcTemplate) {
-		return jdbcTemplate.query("SHOW TABLE STATUS FROM AUTCOM", new RowMapper<Table>() {
+	private List<Table> loadTables(final JdbcTemplate jdbcTemplate, final String databaseName) {
+		return jdbcTemplate.query("SHOW TABLE STATUS FROM " + databaseName, new RowMapper<Table>() {
 			@Override
 			public Table mapRow(ResultSet rs, int rownumber) throws SQLException {
 				String tableNameAsIs = rs.getString("Name");
