@@ -14,12 +14,14 @@
 
 	<jpa:repositories base-package="br.com.citel.monitoramento.repository.autcom"
 		entity-manager-factory-ref="autcomEntityManagerFactory"
-		transaction-manager-ref="autcomTM">
+		transaction-manager-ref="autcomTM"
+		factory-class="br.com.citel.monitoramento.repository.CustomRepositoryFactoryBean">
 	</jpa:repositories>
 
 	<jpa:repositories base-package="br.com.citel.monitoramento.repository.portal"
 		entity-manager-factory-ref="portalEntityManagerFactory"
-		transaction-manager-ref="portalTM">
+		transaction-manager-ref="portalTM"
+		factory-class="br.com.citel.monitoramento.repository.CustomRepositoryFactoryBean">
 	</jpa:repositories>
 
 	<bean id="propertiesFromMonitorINI"

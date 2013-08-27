@@ -1,14 +1,10 @@
 package br.com.citel.monitoramento;
 
-import java.util.List;
-
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import br.com.citel.monitoramento.entity.CONTLO;
-import br.com.citel.monitoramento.entity.CONTMO;
 import br.com.citel.monitoramento.repository.autcom.ContloAutComRepository;
 import br.com.citel.monitoramento.repository.autcom.ContmoAutComRepository;
 import br.com.citel.monitoramento.repository.portal.ContloPortalRepository;
@@ -54,15 +50,13 @@ public class DatabaseSync {
 	}
 
 	private void processaCONTLO() {
-		List<CONTLO> contloList = contloPortalRepository.findByCNPJ(cnpjEmpresa);
-		contloPortalRepository.deleteInBatch(contloList);
-		contloPortalRepository.save(contloAutComRepository.findAll());
+		contloPortalRepository.deleteByCNPJ(cnpjEmpresa);
+		contloPortalRepository.bulkSaveWithoutCheksExists(contloAutComRepository.findAll());
 	}
 
 	private void processaCONTMO() {
-		List<CONTMO> contmoList = contmoPortalRepository.findByEmpresaFiscaAndCNPJ(empresaFisica, cnpjEmpresa);
-		contmoPortalRepository.deleteInBatch(contmoList);
-		contmoPortalRepository.save(contmoAutComRepository.findAll());
+		contmoPortalRepository.deleteByEmpresaFiscaAndCNPJ(empresaFisica, cnpjEmpresa);
+		contmoPortalRepository.bulkSaveWithoutCheksExists(contmoAutComRepository.findAll());
 	}
 
 }

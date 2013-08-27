@@ -79,16 +79,18 @@ public class DatabaseMonitor {
 		log.info("Comparando Estruturas");
 		compareTable(tableSourceList, tableTargetList);
 		log.info("Estruturas comparadas");
-		List<LOG_DTA> logdataList = logdataRepository.findByCNPJ(cnpjEmpresa);
-		logdataRepository.deleteInBatch(logdataList);
+		logdataRepository.deleteByCNPJ(cnpjEmpresa);
+		log.info("Deletada LOG_DTA");
 
+		List<LOG_DTA> logDataList = new ArrayList<LOG_DTA>();
 		for (DatabaseTicket dbTicket : dbTicketList) {
 			LOG_DTA logData = new LOG_DTA();
 			logData.setLOG_C_G_C_(cnpjEmpresa);
 			logData.setLOG_TABELA(dbTicket.getTableName());
 			logData.setLOG_MENSAGEM(dbTicket.getSubject());
-			logdataRepository.save(logData);
+			logDataList.add(logData);
 		}
+		logdataRepository.bulkSaveWithoutCheksExists(logDataList);
 	}
 
 	private void compareTable(List<Table> tableSourceList, List<Table> tableTargetList) {

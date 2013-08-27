@@ -12,6 +12,10 @@
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />
 			<property name="hibernate.use_sql_comments" value="true" />
+			<property name="hibernate.jdbc.batch_size" value="25" />
+			<property name="hibernate.cache.use_second_level_cache"
+				value="false" />
+
 		</properties>
 	</persistence-unit>
 
@@ -26,6 +30,9 @@
 			<property name="hibernate.show_sql" value="true" />
 			<property name="hibernate.format_sql" value="false" />
 			<property name="hibernate.use_sql_comments" value="true" />
+			<property name="hibernate.jdbc.batch_size" value="25" />
+			<property name="hibernate.cache.use_second_level_cache"
+				value="false" />
 		</properties>
 	</persistence-unit>
 
