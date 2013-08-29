@@ -27,10 +27,12 @@ public class Main {
 	 */
 	public static void main(String[] args) throws SQLException {
 		try {
+			log.info("INICIO PROCESSAMENTO>>>>>>>>>>>>>>>>>");
 			@SuppressWarnings({ "resource", "unused" })
 			ApplicationContext appContext = new ClassPathXmlApplicationContext("spring-beans.xml");
+			log.info("FIM PROCESSAMENTO>>>>>>>>>>>>>>>>>");
 		} catch (Throwable t) {
-			log.error("ERRO AO PROCESSAR", t);
+			log.error("ERRO AO PROCESSAR - GERAL", t);
 		}
 	}
 }

@@ -16,5 +16,6 @@ public @Data
 class LOG_DTAPK implements Serializable {
 	private static final long serialVersionUID = 4875895808548080764L;
 	private String LOG_C_G_C_;
+	private String LOG_TABELA;
 	private String LOG_MENSAGEM;
 }

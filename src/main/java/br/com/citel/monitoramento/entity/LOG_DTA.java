@@ -20,6 +20,7 @@ public @Data
 class LOG_DTA {
 	@Id
 	private String LOG_C_G_C_;
+	@Id
 	private String LOG_TABELA;
 	@Id
 	private String LOG_MENSAGEM;

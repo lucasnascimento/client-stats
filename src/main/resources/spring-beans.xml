@@ -29,9 +29,12 @@
 		<property name="order" value="1" />
 		<property name="locations">
 			<list>
+				<value>classpath:Monitor.ini</value>
 				<value>file:/opt/monitor/monitoramento/Monitor.ini</value>
 			</list>
 		</property>
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
 	</bean>
 
 	<bean
@@ -45,7 +48,8 @@
 	<bean id="autcomDS" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl" value="jdbc:mysql://localhost:${portAutc}/${dataAutc}" />
+		<property name="jdbcUrl"
+			value="jdbc:mysql://localhost:${portAutc}/${dataAutc}" />
 		<property name="user" value="${userAutc}" />
 		<property name="password" value="${passAutc}" />
 		<property name="maxStatements" value="500" />

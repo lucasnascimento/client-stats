@@ -67,7 +67,7 @@ public class DbProperties extends Properties {
 
 
 		if (!containsKey("AUTCOM_VERSAO")) {
-			setProperty("AUTCOM_VERSAO", "AUTCOM");
+			setProperty("AUTCOM_VERSAO", "27_18_379_48");
 		}
 
 		setProperty("empFisic", empresaFisica);

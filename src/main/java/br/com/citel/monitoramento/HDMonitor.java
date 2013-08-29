@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.citel.monitoramento.entity.LOG_HD;
+import br.com.citel.monitoramento.entity.LOG_HDPK;
 import br.com.citel.monitoramento.repository.portal.LoghdRepository;
 
 /**
@@ -40,7 +41,7 @@ public class HDMonitor {
 				log.info("MONITORAMENTO HD DESLIGADO.");
 			}
 		} catch (Throwable t) {
-			log.error("ERRO AO PROCESSAR", t);
+			log.error("ERRO AO PROCESSAR - MONITORAMENTO HD", t);
 		}
 	}
 
@@ -69,10 +70,17 @@ public class HDMonitor {
 					loghd.setLOG_TAMANH(columns.get(1));
 					loghd.setLOG_USADO_(columns.get(2));
 					loghd.setLOG_VERSAO(" ");
-					loghdList.add(loghd);
+					
+					LOG_HDPK pk = new LOG_HDPK();
+					pk.setLOG_C_G_C_(loghd.getLOG_C_G_C_());
+					pk.setLOG_SISARQ(loghd.getLOG_SISARQ());
+					
+					if (!loghdRepository.exists(pk)){
+						loghdList.add(loghd);
+					}
 				}
 			}
-			loghdRepository.save(loghdList);
+			loghdRepository.bulkSaveWithoutCheksExists(loghdList);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (InterruptedException e) {

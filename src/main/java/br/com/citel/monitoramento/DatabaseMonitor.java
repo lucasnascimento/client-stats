@@ -66,7 +66,7 @@ public class DatabaseMonitor {
 				log.info("MONITORAMENTO DATABASE DESLIGADO.");
 			}
 		} catch (Throwable t) {
-			log.error("ERRO AO PROCESSAR", t);
+			log.error("ERRO AO PROCESSAR - MONITORAMENTO DATABASE", t);
 		}
 	}
 
@@ -80,6 +80,7 @@ public class DatabaseMonitor {
 		compareTable(tableSourceList, tableTargetList);
 		log.info("Estruturas comparadas");
 		logdataRepository.deleteByCNPJ(cnpjEmpresa);
+		logdataRepository.flush();
 		log.info("Deletada LOG_DTA");
 
 		List<LOG_DTA> logDataList = new ArrayList<LOG_DTA>();
@@ -116,9 +117,9 @@ public class DatabaseMonitor {
 				compareForeignKeys(tableSource.getTableName(), tableSource.getForeignKeys(), tableTarget.getForeignKeys());
 			}
 		}
-		for (Table tableTarget : tableTargetList) {
-			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(), "TABELA NÃO ENCONTRADA NO DATABASE MODELO"));
-		}
+//		for (Table tableTarget : tableTargetList) {
+//			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(), "TABELA NÃO ENCONTRADA NO DATABASE MODELO"));
+//		}
 	}
 
 	private void compareField(String tableName, List<Field> fieldSourceList, List<Field> fieldTargetList) {

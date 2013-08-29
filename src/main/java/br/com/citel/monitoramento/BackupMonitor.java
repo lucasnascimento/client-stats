@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import br.com.citel.monitoramento.entity.LOGBKP;
+import br.com.citel.monitoramento.entity.LOGBKPPK;
 import br.com.citel.monitoramento.repository.portal.LogbkpRepository;
 
 /**
@@ -40,7 +41,7 @@ public class BackupMonitor {
 				log.info("MONITORAMENTO BACKUP DESLIGADO.");
 			}
 		} catch (Throwable t) {
-			log.error("ERRO AO PROCESSAR", t);
+			log.error("ERRO AO PROCESSAR - MONITORAMENTO BACKUP", t);
 		}
 	}
 
@@ -57,12 +58,21 @@ public class BackupMonitor {
 					logBackup.setLOG_DTABKP(new Date(file.lastModified()));
 					logBackup.setLOG_HORBKP(new Time(file.lastModified()));
 					logBackup.setLOG_TAMBKP(file.length());
-					logBackupList.add(logBackup);
+					
+					LOGBKPPK pk = new LOGBKPPK();
+					pk.setLOG_C_G_C_(logBackup.getLOG_C_G_C_());
+					pk.setLOG_DTABKP(logBackup.getLOG_DTABKP());
+					pk.setLOG_NOMBKP(logBackup.getLOG_NOMBKP());
+					
+					if(!logbkpRepository.exists(pk)){
+						logBackupList.add(logBackup);
+					}
+					
 				}
-				logbkpRepository.save(logBackupList);
+				logbkpRepository.bulkSaveWithoutCheksExists(logBackupList);
 			}
 		} else {
-			throw new RuntimeException("bacupPath em branco!");
+			throw new RuntimeException("backupPath em branco!");
 		}
 	}
 }

@@ -3,6 +3,7 @@ package br.com.citel.monitoramento.repository.portal;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.citel.monitoramento.entity.CONTLO;
 import br.com.citel.monitoramento.entity.CONTLOPK;
@@ -24,6 +25,7 @@ public interface ContloPortalRepository extends CustomRepository<CONTLO, CONTLOP
 	 * @return
 	 */
 	@Modifying
+	@Transactional(value="portalTM")
 	@Query("delete from CONTLO c where c.LOG_C_G_C_ = ?1 ")
 	int deleteByCNPJ(String cnpj);
 }

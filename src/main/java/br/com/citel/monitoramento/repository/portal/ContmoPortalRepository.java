@@ -3,6 +3,7 @@ package br.com.citel.monitoramento.repository.portal;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.citel.monitoramento.entity.CONTMO;
 import br.com.citel.monitoramento.entity.CONTMOPK;
@@ -24,6 +25,7 @@ public interface ContmoPortalRepository extends CustomRepository<CONTMO, CONTMOP
 	 * @return
 	 */
 	@Modifying
+	@Transactional(value="portalTM")
 	@Query("delete from CONTMO c where c.EMPRESA_FISICA = ?1 and c.CNPJ = ?2")
 	void deleteByEmpresaFiscaAndCNPJ(Long empresaFisica, String cnpj);
 }

@@ -45,7 +45,7 @@ public class DatabaseSync {
 				log.info("ENVIO DE DADOS DESLIGADO");
 			}
 		} catch (Throwable t) {
-			log.error("ERRO AO PROCESSAR", t);
+			log.error("ERRO AO PROCESSAR - ENVIO CONTOMO E CONTLO", t);
 		}
 	}
 

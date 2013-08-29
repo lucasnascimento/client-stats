@@ -26,7 +26,7 @@ public class CustomRepositoryImpl<T, ID extends Serializable> extends SimpleJpaR
 		int count = 0;
 		for (S s : entities) {
 			entityManager.persist(s);
-			if ((count++ % bulkSize) == 0) {
+			if ((++count % bulkSize) == 0) {
 				entityManager.flush();
 				entityManager.clear();
 			}

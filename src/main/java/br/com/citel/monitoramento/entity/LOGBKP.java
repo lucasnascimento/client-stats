@@ -24,8 +24,9 @@ class LOGBKP {
 	@Id
 	private String LOG_C_G_C_;
 	@Id
-	private String LOG_NOMBKP;
 	private Date LOG_DTABKP;
+	@Id
+	private String LOG_NOMBKP;
 	private Time LOG_HORBKP;
 	private Long LOG_TAMBKP;
 }
