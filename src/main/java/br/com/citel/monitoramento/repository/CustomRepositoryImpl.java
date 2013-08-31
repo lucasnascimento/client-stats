@@ -4,8 +4,11 @@ import java.io.Serializable;
 
 import javax.persistence.EntityManager;
 
+import lombok.extern.log4j.Log4j;
+
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
+@Log4j
 public class CustomRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements CustomRepository<T, ID> {
 
 	private EntityManager entityManager;
@@ -29,6 +32,7 @@ public class CustomRepositoryImpl<T, ID extends Serializable> extends SimpleJpaR
 			if ((++count % bulkSize) == 0) {
 				entityManager.flush();
 				entityManager.clear();
+				log.debug("FLUSHED + CLEAR");
 			}
 		}
 

@@ -72,7 +72,7 @@ public class DatabaseMonitor {
 
 	public void processDatabaseMonitor() throws SQLException {
 		dbTicketList.clear();
-		log.info("Carregando estrutura de tabelas do Souce:" + sourceName);
+		log.info("Carregando estrutura de tabelas do Source:" + sourceName);
 		List<Table> tableSourceList = loadTables(sourceJdbcTemplate, sourceName);
 		log.info("Carregando estrutura de tabelas do Target:" + targetName);
 		List<Table> tableTargetList = loadTables(targetJdbcTemplate, targetName);
