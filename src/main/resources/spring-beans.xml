@@ -49,7 +49,7 @@
 		destroy-method="close">
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
 		<property name="jdbcUrl"
-			value="jdbc:mysql://localhost:${portAutc}/${dataAutc}" />
+			value="jdbc:mysql://vmcitel:${portAutc}/${dataAutc}" />
 		<property name="user" value="${userAutc}" />
 		<property name="password" value="${passAutc}" />
 		<property name="maxStatements" value="500" />

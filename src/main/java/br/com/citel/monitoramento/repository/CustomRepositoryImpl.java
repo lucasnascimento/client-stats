@@ -13,7 +13,7 @@ public class CustomRepositoryImpl<T, ID extends Serializable> extends SimpleJpaR
 
 	private EntityManager entityManager;
 
-	private int bulkSize = 1000;
+	private int bulkSize = 10000;
 
 	// There are two constructors to choose from, either can be used.
 	public CustomRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {

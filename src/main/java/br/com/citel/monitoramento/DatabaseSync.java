@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import br.com.citel.monitoramento.entity.CONTMO;
 import br.com.citel.monitoramento.repository.autcom.ContloAutComRepository;
 import br.com.citel.monitoramento.repository.autcom.ContmoAutComRepository;
 import br.com.citel.monitoramento.repository.portal.ContloPortalRepository;
@@ -55,8 +56,31 @@ public class DatabaseSync {
 	}
 
 	private void processaCONTMO() {
+		long timeInit = System.currentTimeMillis();
+		
+		long timeInitDelete = System.currentTimeMillis();
 		contmoPortalRepository.deleteByEmpresaFiscaAndCNPJ(empresaFisica, cnpjEmpresa);
-		contmoPortalRepository.bulkSaveWithoutCheksExists(contmoAutComRepository.findAll());
+		long timeEndDelete = System.currentTimeMillis();
+		
+		long timeInitGetList = System.currentTimeMillis();
+		Iterable<CONTMO> contmoList = contmoAutComRepository.findAll();
+		long timeEndGetList = System.currentTimeMillis();
+		
+		long timeInitBulkSave = System.currentTimeMillis();
+		contmoPortalRepository.bulkSaveWithoutCheksExists(contmoList);
+		long timeEndBulkSave = System.currentTimeMillis();
+		
+		long timeEnd = System.currentTimeMillis();
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("\n");
+		sb.append(" DELETANDO:   ").append(timeEndDelete - timeInitDelete).append("millis \n");
+		sb.append(" RECUPERANDO LISTA:   ").append(timeEndGetList - timeInitGetList).append("millis \n");
+		sb.append(" BULKINSER:           ").append(timeEndBulkSave - timeInitBulkSave).append("millis \n");
+		sb.append(" TOTAL:               ").append(timeEnd - timeInit).append("millis \n");
+		log.info(sb);
+		
 	}
 
 }
