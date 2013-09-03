@@ -13,6 +13,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -39,11 +40,11 @@ public class DatabaseMonitor {
 
 	@Setter
 	private String cnpjEmpresa;
-	
+
 	@Setter
 	private String sourceName;
-	
-	@Setter 
+
+	@Setter
 	private String targetName;
 
 	@Autowired
@@ -73,14 +74,28 @@ public class DatabaseMonitor {
 	public void processDatabaseMonitor() throws SQLException {
 		dbTicketList.clear();
 		log.info("Carregando estrutura de tabelas do Source:" + sourceName);
-		List<Table> tableSourceList = loadTables(sourceJdbcTemplate, sourceName);
+		List<Table> tableSourceList = null;
+		try {
+			tableSourceList = loadTables(sourceJdbcTemplate, sourceName);
+		} catch (CannotGetJdbcConnectionException ex) {
+			dbTicketList.add(new DatabaseTicket("DATABASE_SOURCE:" + sourceName, "NÃO FOI POSSIVEL CARREGAR OBTER CONEXÃO COM DATABASE SOURCE"));
+		}
 		log.info("Carregando estrutura de tabelas do Target:" + targetName);
-		List<Table> tableTargetList = loadTables(targetJdbcTemplate, targetName);
-		log.info("Comparando Estruturas");
-		compareTable(tableSourceList, tableTargetList);
-		log.info("Estruturas comparadas");
+
+		if (tableSourceList != null) {
+			if (tableSourceList.isEmpty()) {
+				dbTicketList.add(new DatabaseTicket("DATABASE_SOURCE:" + sourceName, "NÃO FOI POSSIVEL AS TABELAS DO SOURCE PARA COMPARAÇÃO"));
+			} else {
+				List<Table> tableTargetList = loadTables(targetJdbcTemplate, targetName);
+				log.info("Comparando Estruturas");
+				compareTable(tableSourceList, tableTargetList);
+				log.info("Estruturas comparadas");
+			}
+		} else {
+			log.info("Não foi possivel carregar conexão com database SOURCE");
+		}
+
 		logdataRepository.deleteByCNPJ(cnpjEmpresa);
-		logdataRepository.flush();
 		log.info("Deletada LOG_DTA");
 
 		List<LOG_DTA> logDataList = new ArrayList<LOG_DTA>();
@@ -92,6 +107,7 @@ public class DatabaseMonitor {
 			logDataList.add(logData);
 		}
 		logdataRepository.bulkSaveWithoutCheksExists(logDataList);
+
 	}
 
 	private void compareTable(List<Table> tableSourceList, List<Table> tableTargetList) {
@@ -117,9 +133,10 @@ public class DatabaseMonitor {
 				compareForeignKeys(tableSource.getTableName(), tableSource.getForeignKeys(), tableTarget.getForeignKeys());
 			}
 		}
-//		for (Table tableTarget : tableTargetList) {
-//			dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(), "TABELA NÃO ENCONTRADA NO DATABASE MODELO"));
-//		}
+		// for (Table tableTarget : tableTargetList) {
+		// dbTicketList.add(new DatabaseTicket(tableTarget.getTableName(),
+		// "TABELA NÃO ENCONTRADA NO DATABASE MODELO"));
+		// }
 	}
 
 	private void compareField(String tableName, List<Field> fieldSourceList, List<Field> fieldTargetList) {
