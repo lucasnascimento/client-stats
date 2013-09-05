@@ -1,5 +1,6 @@
 package br.com.citel.monitoramento.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +16,8 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @EqualsAndHashCode(of = { "tableName" })
 public @Data
-class Table {
+class Table implements Serializable {
+	private static final long serialVersionUID = 2031697677823305454L;
 	private String tableName;
 	private String tableNameAsIs;
 	private String engine;

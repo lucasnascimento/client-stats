@@ -28,8 +28,12 @@ public class Main {
 	public static void main(String[] args) throws SQLException {
 		try {
 			log.info("INICIO PROCESSAMENTO>>>>>>>>>>>>>>>>>");
-			@SuppressWarnings({ "resource", "unused" })
+			@SuppressWarnings({ "resource" })
 			ApplicationContext appContext = new ClassPathXmlApplicationContext("spring-beans.xml");
+			
+			LogNotMonitor lognotMonitor = appContext.getBean(LogNotMonitor.class);
+			lognotMonitor.finalizaMonitoramento();
+			
 			log.info("FIM PROCESSAMENTO>>>>>>>>>>>>>>>>>");
 		} catch (Throwable t) {
 			log.error("ERRO AO PROCESSAR - GERAL", t);

@@ -137,6 +137,13 @@
 		<constructor-arg type="javax.sql.DataSource" ref="autcomDS" />
 	</bean>
 
+	<bean id="portalJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg type="javax.sql.DataSource" ref="portalDS" />
+	</bean>
+
+	<bean class="br.com.citel.monitoramento.LogNotMonitor" init-method="inicializaMonitoramento">
+		<property name="cnpjEmpresa" value="%{EMP_C_G_C_}"></property>
+	</bean>
 
 	<bean class="br.com.citel.monitoramento.DatabaseMonitor"
 		init-method="run">

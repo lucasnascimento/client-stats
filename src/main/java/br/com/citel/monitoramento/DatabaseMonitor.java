@@ -1,5 +1,8 @@
 package br.com.citel.monitoramento;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,6 +14,8 @@ import java.util.Map;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -71,22 +76,34 @@ public class DatabaseMonitor {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void processDatabaseMonitor() throws SQLException {
 		dbTicketList.clear();
-		log.info("Carregando estrutura de tabelas do Source:" + sourceName);
 		List<Table> tableSourceList = null;
 		try {
-			tableSourceList = loadTables(sourceJdbcTemplate, sourceName);
+			if (new File ("./" + sourceName).exists()){
+				log.info("CACHE DO SOURCE ENCONTRADO EM: " + new File ("./" + sourceName).getAbsolutePath());
+				tableSourceList = (List<Table>) SerializationUtils.deserialize(FileUtils.readFileToByteArray(new File ("./" + sourceName)));	
+			}else{
+				log.info("Carregando estrutura de tabelas do Source:" + sourceName);
+				tableSourceList = loadTables(sourceJdbcTemplate, sourceName);
+				FileUtils.writeByteArrayToFile(new File ("./" + sourceName), SerializationUtils.serialize((Serializable) tableSourceList));
+			}
 		} catch (CannotGetJdbcConnectionException ex) {
 			dbTicketList.add(new DatabaseTicket("DATABASE_SOURCE:" + sourceName, "NÃO FOI POSSIVEL CARREGAR OBTER CONEXÃO COM DATABASE SOURCE"));
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		log.info("Carregando estrutura de tabelas do Target:" + targetName);
 
 		if (tableSourceList != null) {
 			if (tableSourceList.isEmpty()) {
-				dbTicketList.add(new DatabaseTicket("DATABASE_SOURCE:" + sourceName, "NÃO FOI POSSIVEL AS TABELAS DO SOURCE PARA COMPARAÇÃO"));
+				dbTicketList.add(new DatabaseTicket("DATABASE_SOURCE:" + sourceName, "NÃO FOI POSSIVEL CARREGAR AS TABELAS DO SOURCE PARA COMPARAÇÃO"));
 			} else {
+				log.info("Carregando estrutura de tabelas do Target:" + targetName);
 				List<Table> tableTargetList = loadTables(targetJdbcTemplate, targetName);
+				if (tableTargetList.isEmpty()){
+					dbTicketList.add(new DatabaseTicket("DATABASE_TARGET:" + targetName, "NÃO FOI POSSIVEL CARREGAR AS TABELAS DO TARGET PARA COMPARAÇÃO"));
+				}
 				log.info("Comparando Estruturas");
 				compareTable(tableSourceList, tableTargetList);
 				log.info("Estruturas comparadas");
@@ -97,13 +114,24 @@ public class DatabaseMonitor {
 
 		logdataRepository.deleteByCNPJ(cnpjEmpresa);
 		log.info("Deletada LOG_DTA");
-
+		
+		Map<String, String> map = new HashMap<String, String>();
+		for (DatabaseTicket dbTicket : dbTicketList){
+			String valor = map.get(dbTicket.getTableName());
+			if (valor != null){				
+				map.put(dbTicket.getTableName(), valor + '\n' + dbTicket.getSubject());
+			}else{
+				map.put(dbTicket.getTableName(), dbTicket.getSubject());
+			}
+		}
+		
 		List<LOG_DTA> logDataList = new ArrayList<LOG_DTA>();
-		for (DatabaseTicket dbTicket : dbTicketList) {
+		for (String key : map.keySet()) {
 			LOG_DTA logData = new LOG_DTA();
 			logData.setLOG_C_G_C_(cnpjEmpresa);
-			logData.setLOG_TABELA(dbTicket.getTableName());
-			logData.setLOG_MENSAGEM(dbTicket.getSubject());
+			logData.setLOG_TABELA(key);
+			logData.setLOG_MENSAGEM(map.get(key));
+			log.info(logData);
 			logDataList.add(logData);
 		}
 		logdataRepository.bulkSaveWithoutCheksExists(logDataList);
@@ -154,7 +182,7 @@ public class DatabaseMonitor {
 					dbTicketList.add(new DatabaseTicket(tableName, String.format("DEFAUL INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getDef(),
 							fieldTarget.getFieldName(), fieldTarget.getDef())));
 				}
-				if (fieldTarget.getNullable() != fieldSource.getNullable()) {
+				if (!fieldTarget.getNullable().equals( fieldSource.getNullable())) {
 					dbTicketList.add(new DatabaseTicket(tableName, String.format("NULL INCONSISTENTE: NO MODELO: %s %s DESTINO: %s %s ", fieldSource.getFieldName(), fieldSource.getNullable(),
 							fieldTarget.getFieldName(), fieldTarget.getNullable())));
 				}
@@ -233,6 +261,7 @@ public class DatabaseMonitor {
 		return jdbcTemplate.query("SHOW TABLE STATUS FROM " + databaseName, new RowMapper<Table>() {
 			@Override
 			public Table mapRow(ResultSet rs, int rownumber) throws SQLException {
+				long intialTime = System.currentTimeMillis();
 				String tableNameAsIs = rs.getString("Name");
 				String tableName = StringUtils.upperCase(tableNameAsIs);
 				String engine = StringUtils.upperCase(rs.getString("Engine"));
@@ -242,6 +271,9 @@ public class DatabaseMonitor {
 				List<Field> fields = loadFields(jdbcTemplate, tableNameAsIs, createTable);
 				List<Index> indexes = loadIndexes(jdbcTemplate, tableNameAsIs);
 				List<ForeignKey> foreignKeys = loadForeignKey(createTable);
+				long endTime = System.currentTimeMillis();
+				
+				System.out.println(databaseName + "." + tableNameAsIs + " carregado em " + (endTime - intialTime) + "ms" );
 
 				return new Table(tableName, tableNameAsIs, engine, collation, fields, indexes, foreignKeys, createTable);
 			}

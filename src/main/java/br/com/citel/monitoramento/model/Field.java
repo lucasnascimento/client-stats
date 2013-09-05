@@ -1,5 +1,7 @@
 package br.com.citel.monitoramento.model;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,7 +15,8 @@ import lombok.EqualsAndHashCode;
 @AllArgsConstructor
 @EqualsAndHashCode(of = { "fieldName" })
 public @Data
-class Field {
+class Field implements Serializable {
+	private static final long serialVersionUID = 2710410097602206096L;
 	private String fieldName;
 	private String type;
 	private Boolean nullable;

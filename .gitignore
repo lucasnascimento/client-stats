@@ -8,3 +8,5 @@ target/
 config.properties
 log/
 *.gz
+*.log
+27_18_379_48
