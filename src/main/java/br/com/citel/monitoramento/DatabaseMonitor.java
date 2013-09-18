@@ -1,7 +1,5 @@
 package br.com.citel.monitoramento;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +12,7 @@ import java.util.Map;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SerializationException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +20,15 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import br.com.citel.monitoramento.entity.CFGDTA;
+import br.com.citel.monitoramento.entity.CFGDTAPK;
 import br.com.citel.monitoramento.entity.LOG_DTA;
 import br.com.citel.monitoramento.model.DatabaseTicket;
 import br.com.citel.monitoramento.model.Field;
 import br.com.citel.monitoramento.model.ForeignKey;
 import br.com.citel.monitoramento.model.Index;
 import br.com.citel.monitoramento.model.Table;
+import br.com.citel.monitoramento.repository.portal.CfgdtaRepository;
 import br.com.citel.monitoramento.repository.portal.LogdataRepository;
 
 /**
@@ -54,6 +55,9 @@ public class DatabaseMonitor {
 
 	@Autowired
 	private LogdataRepository logdataRepository;
+	
+	@Autowired
+	private CfgdtaRepository cfgdtaRepository;
 
 	@Autowired
 	private JdbcTemplate sourceJdbcTemplate;
@@ -81,18 +85,22 @@ public class DatabaseMonitor {
 		dbTicketList.clear();
 		List<Table> tableSourceList = null;
 		try {
-			if (new File ("./" + sourceName).exists()){
-				log.info("CACHE DO SOURCE ENCONTRADO EM: " + new File ("./" + sourceName).getAbsolutePath());
-				tableSourceList = (List<Table>) SerializationUtils.deserialize(FileUtils.readFileToByteArray(new File ("./" + sourceName)));	
+			CFGDTAPK pk = new CFGDTAPK();
+			pk.setDTA_VERSAO(sourceName);
+			CFGDTA cfgdta = cfgdtaRepository.findOne(pk);
+			if (cfgdta != null && cfgdta.getDTA_ESTRUTURA().length > 0){
+				log.info("CACHE DO SOURCE ENCONTRADO NO DATABASE PORTAL");
+				tableSourceList = (List<Table>) SerializationUtils.deserialize(cfgdta.getDTA_ESTRUTURA());	
 			}else{
 				log.info("Carregando estrutura de tabelas do Source:" + sourceName);
 				tableSourceList = loadTables(sourceJdbcTemplate, sourceName);
-				FileUtils.writeByteArrayToFile(new File ("./" + sourceName), SerializationUtils.serialize((Serializable) tableSourceList));
+				cfgdta = new CFGDTA(sourceName, SerializationUtils.serialize((Serializable) tableSourceList));
+				cfgdtaRepository.save(cfgdta);
 			}
 		} catch (CannotGetJdbcConnectionException ex) {
 			dbTicketList.add(new DatabaseTicket("DATABASE_SOURCE:" + sourceName, "NÃO FOI POSSIVEL CARREGAR OBTER CONEXÃO COM DATABASE SOURCE"));
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (SerializationException ex){
+			dbTicketList.add(new DatabaseTicket("CARREGANDO DO DATABASE PORTAL:" + sourceName, "CAMPO ESTRUTURA CORROMPIDO, TENTE APAGAR A LINHA DO CFGDTA DESTE VERSÃO"));
 		}
 
 		if (tableSourceList != null) {
