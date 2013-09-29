@@ -48,20 +48,32 @@ public class HDMonitor {
 	public void processHDMonitor() {
 
 		try {
-			ArrayList<LOG_HD> loghdList = new ArrayList<LOG_HD>();
+//			ArrayList<LOG_HD> loghdList = new ArrayList<LOG_HD>();
 			Process p = Runtime.getRuntime().exec("df -h");
 			p.waitFor();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 			while ((line = reader.readLine()) != null) {
 				List<String> columns = new ArrayList<String>();
-				for (String column : Arrays.asList(line.split("  "))) {
+				for (String column : Arrays.asList(line.split(" "))) {
 					if (StringUtils.isNotBlank(column)) {
 						columns.add(column.trim());
 					}
 				}
+				
+				System.out.println(Arrays.toString(columns.toArray()));
+				System.out.println(columns.size());
+				
 				if (columns.size() == 6) {
-					LOG_HD loghd = new LOG_HD();
+					LOG_HDPK pk = new LOG_HDPK();
+					pk.setLOG_C_G_C_(cnpjEmpresa);
+					pk.setLOG_SISARQ(columns.get(0));
+					LOG_HD loghd;
+					if (!loghdRepository.exists(pk)){
+						loghd = new LOG_HD();
+					}else{
+						loghd = loghdRepository.findOne(pk);
+					}
 					loghd.setLOG_C_G_C_(cnpjEmpresa);
 					loghd.setLOG_DISPON(columns.get(3));
 					loghd.setLOG_MONTAG(columns.get(5));
@@ -70,17 +82,10 @@ public class HDMonitor {
 					loghd.setLOG_TAMANH(columns.get(1));
 					loghd.setLOG_USADO_(columns.get(2));
 					loghd.setLOG_VERSAO(" ");
-					
-					LOG_HDPK pk = new LOG_HDPK();
-					pk.setLOG_C_G_C_(loghd.getLOG_C_G_C_());
-					pk.setLOG_SISARQ(loghd.getLOG_SISARQ());
-					
-					if (!loghdRepository.exists(pk)){
-						loghdList.add(loghd);
-					}
+					loghdRepository.save(loghd);
 				}
 			}
-			loghdRepository.bulkSaveWithoutCheksExists(loghdList);
+//			loghdRepository.bulkSaveWithoutCheksExists(loghdList);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (InterruptedException e) {
